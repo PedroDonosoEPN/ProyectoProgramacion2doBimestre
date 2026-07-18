@@ -1,30 +1,35 @@
 package GUI.Form;
 
 import GUI.Style;
+import SistemaVentas.Factura;
+import SistemaVentas.Inventario;
+import SistemaVentas.Producto;
+import SistemaVentas.Venta;
 import java.awt.*;
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
 
 public class VistaVentas extends JPanel {
 
-    public JButton btnVolver = new JButton("< Volver");
+    public JButton btnVolver = new JButton("✕ Cancelar Venta");
     public JButton btnAgregar = new JButton("+ Agregar producto");
     public JButton btnTerminar = new JButton("> Terminar");
     private JTable tablaCarrito;
     private JLabel lblSubtotal;
     private JTextField txtEscaner;
 
-    private static final String RUTA_INVENTARIO =
-            "C:\\PedroDonosoEPN\\Programacion II\\ProyectoProgramacion2doBimestre\\src\\datos_inventario.txt";
-    private static final String RUTA_VENTAS =
-            "C:\\PedroDonosoEPN\\Programacion II\\ProyectoProgramacion2doBimestre\\src\\registro_ventas.txt";
+    // Instancias de la lógica de negocio
+    private Inventario gestionInventario = new Inventario();
+    private Venta ventaActual = new Venta();
 
+    private static final String RUTA_VENTAS = "data/registro_ventas.txt";
     private static final int COL_ACCION = 3;
 
     public VistaVentas() {
@@ -34,8 +39,6 @@ public class VistaVentas extends JPanel {
         configurarAcciones();
     }
 
-    /** Cuando la vista se hace visible, el foco pasa directo al campo de escaneo:
-     *  así el lector puede "escribir" el código sin que el usuario tenga que hacer clic antes. */
     @Override
     public void addNotify() {
         super.addNotify();
@@ -43,11 +46,24 @@ public class VistaVentas extends JPanel {
     }
 
     private void configurarAcciones() {
+        // Botón cancelar venta: pide confirmación si ya hay productos en el carrito
         btnVolver.addActionListener(e -> {
+            if (!ventaActual.getDetalleCarrito().isEmpty()) {
+                int confirmacion = JOptionPane.showConfirmDialog(
+                        this,
+                        "Tienes productos agregados. ¿Seguro que deseas cancelar esta venta?",
+                        "Cancelar venta",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE
+                );
+                if (confirmacion != JOptionPane.YES_OPTION) return;
+            }
+
             JFrame ventanaPrincipal = (JFrame) SwingUtilities.getWindowAncestor(this);
-            ventanaPrincipal.getContentPane().removeAll();
-            ventanaPrincipal.add(new MenuPanel(), BorderLayout.WEST);
-            ventanaPrincipal.add(new MainPanel(), BorderLayout.CENTER);
+            Container cont = ventanaPrincipal.getContentPane();
+            cont.removeAll();
+            cont.setLayout(new BorderLayout());
+            cont.add(new MenuPanel(), BorderLayout.CENTER);
             ventanaPrincipal.revalidate();
             ventanaPrincipal.repaint();
         });
@@ -55,7 +71,7 @@ public class VistaVentas extends JPanel {
         txtEscaner.addActionListener(e -> escanearProducto());
 
         btnAgregar.addActionListener(e -> {
-            List<Producto> productosDisponibles = cargarInventario();
+            List<Producto> productosDisponibles = gestionInventario.obtenerProductos();
             if (productosDisponibles.isEmpty()) {
                 Style.showMsgError("No hay productos en el inventario. Agrega productos antes de vender.");
                 return;
@@ -65,44 +81,89 @@ public class VistaVentas extends JPanel {
             DialogoAgregarVenta dialogo = new DialogoAgregarVenta(ventanaPrincipal, productosDisponibles, cantidadesYaEnCarrito());
             dialogo.setVisible(true);
 
-            ItemVenta item = dialogo.getItemSeleccionado();
+            Venta.ItemCarrito item = dialogo.getItemSeleccionado();
             if (item != null) {
-                agregarOFusionarEnCarrito(item);
-                recalcularSubtotal();
+                ventaActual.agregarProducto(item.getProducto(), item.getCantidad());
+                actualizarVistaCarrito();
             }
         });
 
         btnTerminar.addActionListener(e -> {
-            DefaultTableModel modelo = (DefaultTableModel) tablaCarrito.getModel();
-            if (modelo.getRowCount() == 0) {
+            if (ventaActual.getDetalleCarrito().isEmpty()) {
                 Style.showMsgError("Agrega al menos un producto antes de terminar la venta.");
                 return;
             }
 
-            double total = calcularSubtotal();
-            int confirmacion = JOptionPane.showConfirmDialog(
-                    this,
-                    String.format(Locale.US, "Total a cobrar: $%.2f%n¿Confirmas la venta?", total),
-                    "Confirmar venta",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE
-            );
+            String inputDinero = JOptionPane.showInputDialog(this,
+                    String.format(Locale.US, "Total a cobrar: $%.2f\nIngrese el efectivo recibido:", ventaActual.getTotal()),
+                    "Procesar Pago",
+                    JOptionPane.QUESTION_MESSAGE);
 
-            if (confirmacion == JOptionPane.YES_OPTION) {
-                if (descontarStockInventario(modelo)) {
-                    registrarVenta(modelo, total);
-                    modelo.setRowCount(0);
-                    recalcularSubtotal();
-                    JOptionPane.showMessageDialog(this, "Venta registrada correctamente.",
-                            "Listo", JOptionPane.INFORMATION_MESSAGE);
+            if (inputDinero != null && !inputDinero.trim().isEmpty()) {
+                try {
+                    double dineroRecibido = Double.parseDouble(inputDinero);
+
+                    // Procesa el pago y calcula el vuelto
+                    ventaActual.procesarPago(dineroRecibido);
+
+                    // Si el pago es exitoso, descontamos el stock y registramos en archivos
+                    descontarStockInventario();
+                    registrarVentaArchivo();
+
+                    // Mostrar comprobante impreso en la interfaz gráfica
+                    Factura comprobante = ventaActual.getComprobante();
+                    JOptionPane.showMessageDialog(this,
+                            comprobante.generarTextoRecibo(),
+                            "Venta Exitosa",
+                            JOptionPane.INFORMATION_MESSAGE);
+
+                    // Reiniciar para la siguiente venta
+                    ventaActual = new Venta();
+                    actualizarVistaCarrito();
+
+                } catch (NumberFormatException ex) {
+                    Style.showMsgError("Ingrese una cantidad numérica válida.");
+                } catch (IllegalArgumentException ex) {
+                    Style.showMsgError(ex.getMessage());
                 }
             }
         });
     }
 
+    private void actualizarVistaCarrito() {
+        DefaultTableModel modelo = (DefaultTableModel) tablaCarrito.getModel();
+        modelo.setRowCount(0);
+
+        for (Venta.ItemCarrito item : ventaActual.getDetalleCarrito()) {
+            modelo.addRow(new Object[]{
+                    item.getProducto().getNombre(),
+                    "x" + item.getCantidad(),
+                    String.format(Locale.US, "$%.2f", item.getSubtotal()),
+                    "−"
+            });
+        }
+
+        lblSubtotal.setText(String.format(Locale.US, "$%.2f", ventaActual.getTotal()));
+    }
+
+    // ---------- Menús y Paneles Visuales ----------
+
     private JPanel crearMenuLateral() {
-        JPanel panelMenu = new JPanel();
-        panelMenu.setBackground(Style.COLOR_PANEL_LATERAL);
+        JPanel panelMenu = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                Color colorTop = new Color(24, 32, 46);
+                Color colorBottom = new Color(14, 18, 24);
+                GradientPaint gp = new GradientPaint(0, 0, colorTop, 0, getHeight(), colorBottom);
+                g2d.setPaint(gp);
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+                g2d.dispose();
+                super.paintComponent(g);
+            }
+        };
+        panelMenu.setOpaque(false);
         panelMenu.setPreferredSize(new Dimension(220, 0));
         panelMenu.setLayout(new BoxLayout(panelMenu, BoxLayout.Y_AXIS));
         panelMenu.setBorder(new EmptyBorder(30, 20, 30, 20));
@@ -113,6 +174,8 @@ public class VistaVentas extends JPanel {
         lblModulo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         configurarBotonPlano(btnVolver);
+        btnVolver.setBackground(new Color(192, 57, 43));
+
         configurarBotonPlano(btnTerminar);
         btnTerminar.setBackground(new Color(39, 174, 96));
 
@@ -132,17 +195,41 @@ public class VistaVentas extends JPanel {
         JPanel panelSuperior = new JPanel(new BorderLayout(0, 12));
         panelSuperior.setBackground(Style.COLOR_FONDO_PRINCIPAL);
 
+        // ---- Zona de escaneo mejorada ----
         JPanel filaEscaner = new JPanel(new BorderLayout(10, 0));
         filaEscaner.setBackground(Style.COLOR_FONDO_PRINCIPAL);
-        JLabel lblEscaner = new JLabel("Escanear producto:");
+        filaEscaner.setBorder(new EmptyBorder(0, 0, 5, 0));
+
+        JLabel lblIconoEscaner = new JLabel("📷");
+        lblIconoEscaner.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 22));
+
+        JPanel panelTextoEscaner = new JPanel();
+        panelTextoEscaner.setLayout(new BoxLayout(panelTextoEscaner, BoxLayout.Y_AXIS));
+        panelTextoEscaner.setBackground(Style.COLOR_FONDO_PRINCIPAL);
+
+        JLabel lblEscaner = new JLabel("Escanear producto");
         lblEscaner.setFont(Style.FONT_BOLD);
+
+        JLabel lblHintEscaner = new JLabel("Enfoca aquí y escanea el código de barras, o escríbelo y presiona Enter");
+        lblHintEscaner.setFont(Style.FONT.deriveFont(Font.PLAIN, 11f));
+        lblHintEscaner.setForeground(new Color(127, 140, 141));
+
+        panelTextoEscaner.add(lblEscaner);
+        panelTextoEscaner.add(lblHintEscaner);
+
         txtEscaner = new JTextField();
-        txtEscaner.setFont(Style.FONT);
+        txtEscaner.setFont(Style.FONT.deriveFont(16f));
         txtEscaner.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(220, 220, 220), 1, true),
-                new EmptyBorder(8, 12, 8, 12)
+                BorderFactory.createLineBorder(new Color(52, 152, 219), 2, true),
+                new EmptyBorder(10, 14, 10, 14)
         ));
-        filaEscaner.add(lblEscaner, BorderLayout.WEST);
+
+        JPanel filaSuperiorEscaner = new JPanel(new BorderLayout(12, 0));
+        filaSuperiorEscaner.setBackground(Style.COLOR_FONDO_PRINCIPAL);
+        filaSuperiorEscaner.add(lblIconoEscaner, BorderLayout.WEST);
+        filaSuperiorEscaner.add(panelTextoEscaner, BorderLayout.CENTER);
+
+        filaEscaner.add(filaSuperiorEscaner, BorderLayout.NORTH);
         filaEscaner.add(txtEscaner, BorderLayout.CENTER);
 
         JPanel filaBotones = new JPanel(new BorderLayout());
@@ -231,12 +318,8 @@ public class VistaVentas extends JPanel {
         });
     }
 
-    // ---------- Escaneo con lector de código de barras ----------
+    // ---------- Lógica de Escaneo y Stock ----------
 
-    /**
-     * El lector de código de barras funciona como un teclado: escribe el código
-     * y termina enviando un Enter, que dispara este mismo evento (ActionListener del JTextField).
-     */
     private void escanearProducto() {
         String codigo = txtEscaner.getText().trim();
         txtEscaner.setText("");
@@ -244,10 +327,10 @@ public class VistaVentas extends JPanel {
 
         if (codigo.isEmpty()) return;
 
-        List<Producto> productos = cargarInventario();
+        List<Producto> productos = gestionInventario.obtenerProductos();
         Producto encontrado = null;
         for (Producto p : productos) {
-            if (p.codigo.equalsIgnoreCase(codigo)) {
+            if (p.getCodigo().equalsIgnoreCase(codigo)) {
                 encontrado = p;
                 break;
             }
@@ -258,206 +341,81 @@ public class VistaVentas extends JPanel {
             return;
         }
 
-        int yaAgregado = cantidadesYaEnCarrito().getOrDefault(encontrado.nombre, 0);
-        if (yaAgregado >= encontrado.stock) {
-            Style.showMsgError("Ya no hay más stock disponible de \"" + encontrado.nombre + "\".");
+        int yaAgregado = cantidadesYaEnCarrito().getOrDefault(encontrado.getNombre(), 0);
+        if (yaAgregado >= encontrado.getCantidad()) {
+            Style.showMsgError("Ya no hay más stock disponible de \"" + encontrado.getNombre() + "\".");
             return;
         }
-
-        agregarOFusionarEnCarrito(new ItemVenta(encontrado.nombre, 1, encontrado.precio));
-        recalcularSubtotal();
+        ventaActual.agregarProducto(encontrado, 1);
+        actualizarVistaCarrito();
     }
 
-    // ---------- Lógica del carrito ----------
-
-    /** Si el producto ya está en el carrito, suma la cantidad en vez de duplicar la fila. */
-    private void agregarOFusionarEnCarrito(ItemVenta item) {
-        DefaultTableModel modelo = (DefaultTableModel) tablaCarrito.getModel();
-        for (int i = 0; i < modelo.getRowCount(); i++) {
-            String nombreFila = (String) modelo.getValueAt(i, 0);
-            if (nombreFila.equals(item.nombre)) {
-                int cantidadActual = extraerCantidad((String) modelo.getValueAt(i, 1));
-                int nuevaCantidad = cantidadActual + item.cantidad;
-                modelo.setValueAt("x" + nuevaCantidad, i, 1);
-                modelo.setValueAt(formatoMoneda(item.precioUnitario * nuevaCantidad), i, 2);
-                return;
-            }
-        }
-        modelo.addRow(new Object[]{
-                item.nombre, "x" + item.cantidad, formatoMoneda(item.precioUnitario * item.cantidad), "−"
-        });
-        // Guardamos el precio unitario "escondido" via propiedad del cliente en un mapa auxiliar
-        preciosUnitarios.put(item.nombre, item.precioUnitario);
-    }
-
-    private final java.util.Map<String, Double> preciosUnitarios = new java.util.HashMap<>();
-
-    private int extraerCantidad(String texto) {
-        return Integer.parseInt(texto.replace("x", "").trim());
-    }
-
-    private String formatoMoneda(double valor) {
-        return String.format(Locale.US, "$%.2f", valor);
-    }
-
-    private double calcularSubtotal() {
-        DefaultTableModel modelo = (DefaultTableModel) tablaCarrito.getModel();
-        double total = 0;
-        for (int i = 0; i < modelo.getRowCount(); i++) {
-            String texto = (String) modelo.getValueAt(i, 2);
-            total += Double.parseDouble(texto.replace("$", ""));
-        }
-        return total;
-    }
-
-    private void recalcularSubtotal() {
-        lblSubtotal.setText(formatoMoneda(calcularSubtotal()));
-    }
-
-    /** Cantidades que ya están en el carrito, para no dejar vender más de lo que hay en stock. */
     private java.util.Map<String, Integer> cantidadesYaEnCarrito() {
         java.util.Map<String, Integer> mapa = new java.util.HashMap<>();
-        DefaultTableModel modelo = (DefaultTableModel) tablaCarrito.getModel();
-        for (int i = 0; i < modelo.getRowCount(); i++) {
-            String nombre = (String) modelo.getValueAt(i, 0);
-            mapa.put(nombre, extraerCantidad((String) modelo.getValueAt(i, 1)));
+        for (Venta.ItemCarrito item : ventaActual.getDetalleCarrito()) {
+            mapa.put(item.getProducto().getNombre(), mapa.getOrDefault(item.getProducto().getNombre(), 0) + item.getCantidad());
         }
         return mapa;
     }
 
-    // ---------- Inventario ----------
+    private void descontarStockInventario() {
+        List<Producto> inventarioCompleto = gestionInventario.obtenerProductos();
 
-    private List<Producto> cargarInventario() {
-        List<Producto> lista = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(RUTA_INVENTARIO))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                String[] datos = linea.split(",", -1);
-                if (datos.length == 5) {
-                    try {
-                        lista.add(new Producto(datos[0], datos[1], Integer.parseInt(datos[2].trim()), Double.parseDouble(datos[3].trim())));
-                    } catch (NumberFormatException ignorada) {
-                        // Fila con datos corruptos: se omite en vez de romper toda la carga
-                    }
+        for (Venta.ItemCarrito vendido : ventaActual.getDetalleCarrito()) {
+            for (Producto p : inventarioCompleto) {
+                if (p.getCodigo().equals(vendido.getProducto().getCodigo())) {
+                    int nuevoStock = p.getCantidad() - vendido.getCantidad();
+                    p.setCantidad(nuevoStock);
                 }
             }
-        } catch (IOException e) {
-            Style.showMsgError("No se pudo leer el inventario:\n" + e.getMessage());
         }
-        return lista;
+        gestionInventario.guardarTodo(inventarioCompleto);
     }
 
-    /** Descuenta del inventario las cantidades vendidas. Si algo ya no alcanza, cancela todo y avisa. */
-    private boolean descontarStockInventario(DefaultTableModel modeloCarrito) {
-        List<String[]> filasInventario = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(RUTA_INVENTARIO))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                String[] datos = linea.split(",", -1);
-                if (datos.length == 5) filasInventario.add(datos);
+    private void registrarVentaArchivo() {
+        try {
+            java.io.File archivo = new java.io.File(RUTA_VENTAS);
+            java.io.File carpeta = archivo.getParentFile();
+            if (carpeta != null && !carpeta.exists()) {
+                carpeta.mkdirs();
             }
-        } catch (IOException e) {
-            Style.showMsgError("No se pudo leer el inventario:\n" + e.getMessage());
-            return false;
-        }
 
-        for (int i = 0; i < modeloCarrito.getRowCount(); i++) {
-            String nombre = (String) modeloCarrito.getValueAt(i, 0);
-            int cantidadVendida = extraerCantidad((String) modeloCarrito.getValueAt(i, 1));
-
-            boolean encontrado = false;
-            for (String[] fila : filasInventario) {
-                if (fila[0].equals(nombre)) {
-                    int stockActual = Integer.parseInt(fila[2].trim());
-                    if (stockActual < cantidadVendida) {
-                        Style.showMsgError("Ya no hay suficiente stock de \"" + nombre + "\". Stock actual: " + stockActual);
-                        return false;
-                    }
-                    fila[2] = String.valueOf(stockActual - cantidadVendida);
-                    encontrado = true;
-                    break;
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(archivo, true))) {
+                StringBuilder detalle = new StringBuilder();
+                List<Venta.ItemCarrito> items = ventaActual.getDetalleCarrito();
+                for (int i = 0; i < items.size(); i++) {
+                    if (i > 0) detalle.append(" | ");
+                    detalle.append(items.get(i).getProducto().getNombre())
+                           .append(" x")
+                           .append(items.get(i).getCantidad());
                 }
-            }
-            if (!encontrado) {
-                Style.showMsgError("El producto \"" + nombre + "\" ya no existe en el inventario.");
-                return false;
-            }
-        }
-
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(RUTA_INVENTARIO))) {
-            for (String[] fila : filasInventario) {
-                bw.write(String.join(",", fila));
+                bw.write(java.time.LocalDateTime.now() + ";" + String.format(Locale.US, "%.2f", ventaActual.getTotal()) + ";" + detalle);
                 bw.newLine();
             }
         } catch (IOException e) {
-            Style.showMsgError("No se pudo actualizar el inventario:\n" + e.getMessage());
-            return false;
-        }
-        return true;
-    }
-
-    private void registrarVenta(DefaultTableModel modeloCarrito, double total) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(RUTA_VENTAS, true))) {
-            StringBuilder detalle = new StringBuilder();
-            for (int i = 0; i < modeloCarrito.getRowCount(); i++) {
-                if (i > 0) detalle.append(" | ");
-                detalle.append(modeloCarrito.getValueAt(i, 0))
-                        .append(" ")
-                        .append(modeloCarrito.getValueAt(i, 1));
-            }
-            bw.write(java.time.LocalDateTime.now() + ";" + String.format(Locale.US, "%.2f", total) + ";" + detalle);
-            bw.newLine();
-        } catch (IOException e) {
-            Style.showMsgError("La venta se procesó pero no se pudo guardar el registro:\n" + e.getMessage());
+            Style.showMsgError("No se pudo guardar el registro de la venta: " + e.getMessage());
         }
     }
 
-    // ---------- Clases de apoyo ----------
+    // ---------- Diálogo de Selección ----------
 
-    private static class Producto {
-        final String nombre;
-        final String codigo;
-        final int stock;
-        final double precio;
-        Producto(String nombre, String codigo, int stock, double precio) {
-            this.nombre = nombre;
-            this.codigo = codigo;
-            this.stock = stock;
-            this.precio = precio;
-        }
-        @Override
-        public String toString() {
-            return nombre + " (stock: " + stock + ", $" + String.format(Locale.US, "%.2f", precio) + ")";
-        }
-    }
-
-    private static class ItemVenta {
-        final String nombre;
-        final int cantidad;
-        final double precioUnitario;
-        ItemVenta(String nombre, int cantidad, double precioUnitario) {
-            this.nombre = nombre;
-            this.cantidad = cantidad;
-            this.precioUnitario = precioUnitario;
-        }
-    }
-
-    /** Diálogo modal para elegir un producto del inventario y una cantidad válida según el stock. */
-    private static class DialogoAgregarVenta extends JDialog {
-
-        private final JComboBox<Producto> comboProductos;
+    private class DialogoAgregarVenta extends JDialog {
+        private final JComboBox<String> comboProductos;
         private final JSpinner spinnerCantidad;
         private final JLabel lblError = new JLabel(" ");
         private final java.util.Map<String, Integer> yaEnCarrito;
-        private ItemVenta itemSeleccionado = null;
+        private Venta.ItemCarrito itemSeleccionado = null;
+        private List<Producto> listaProductos;
 
         DialogoAgregarVenta(JFrame padre, List<Producto> productos, java.util.Map<String, Integer> yaEnCarrito) {
             super(padre, "Agregar producto a la venta", true);
+            this.listaProductos = productos;
             this.yaEnCarrito = yaEnCarrito;
             setLayout(new BorderLayout(10, 10));
             setResizable(false);
 
-            comboProductos = new JComboBox<>(productos.toArray(new Producto[0]));
+            String[] nombres = productos.stream().map(Producto::getNombre).toArray(String[]::new);
+            comboProductos = new JComboBox<>(nombres);
             spinnerCantidad = new JSpinner(new SpinnerNumberModel(1, 1, 1, 1));
 
             JPanel form = new JPanel(new GridLayout(2, 2, 10, 12));
@@ -486,22 +444,22 @@ public class VistaVentas extends JPanel {
             btnAgregar.addActionListener(e -> validarYConfirmar());
             btnCancelar.addActionListener(e -> dispose());
             getRootPane().setDefaultButton(btnAgregar);
-            getRootPane().registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke("ESCAPE"),
-                    JComponent.WHEN_IN_FOCUSED_WINDOW);
+            getRootPane().registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke("ESCAPE"), JComponent.WHEN_IN_FOCUSED_WINDOW);
 
             pack();
             setLocationRelativeTo(padre);
         }
 
-        /** El máximo del spinner siempre refleja el stock real menos lo que ya se agregó antes en este carrito. */
         private void actualizarMaximoDisponible() {
-            Producto seleccionado = (Producto) comboProductos.getSelectedItem();
-            if (seleccionado == null) return;
-            int yaAgregado = yaEnCarrito.getOrDefault(seleccionado.nombre, 0);
-            int disponible = Math.max(seleccionado.stock - yaAgregado, 0);
+            int index = comboProductos.getSelectedIndex();
+            if (index < 0) return;
+            Producto seleccionado = listaProductos.get(index);
+
+            int yaAgregado = yaEnCarrito.getOrDefault(seleccionado.getNombre(), 0);
+            int disponible = Math.max(seleccionado.getCantidad() - yaAgregado, 0);
 
             if (disponible == 0) {
-                lblError.setText("Ya agregaste todo el stock disponible de este producto.");
+                lblError.setText("Ya agregaste todo el stock disponible.");
                 spinnerCantidad.setModel(new SpinnerNumberModel(0, 0, 0, 1));
                 spinnerCantidad.setEnabled(false);
             } else {
@@ -512,26 +470,26 @@ public class VistaVentas extends JPanel {
         }
 
         private void validarYConfirmar() {
-            Producto seleccionado = (Producto) comboProductos.getSelectedItem();
-            if (seleccionado == null) {
-                lblError.setText("Selecciona un producto.");
-                return;
-            }
+            int index = comboProductos.getSelectedIndex();
+            if (index < 0) return;
+            Producto seleccionado = listaProductos.get(index);
+
             int cantidad = (Integer) spinnerCantidad.getValue();
             if (cantidad <= 0) {
                 lblError.setText("La cantidad debe ser mayor a 0.");
                 return;
             }
-            itemSeleccionado = new ItemVenta(seleccionado.nombre, cantidad, seleccionado.precio);
+
+            itemSeleccionado = ventaActual.new ItemCarrito(seleccionado, cantidad);
             dispose();
         }
 
-        ItemVenta getItemSeleccionado() {
+        Venta.ItemCarrito getItemSeleccionado() {
             return itemSeleccionado;
         }
     }
 
-    // ---------- Botón "−" embebido en cada fila de la tabla ----------
+    // ---------- Botón "−" en la tabla ----------
 
     private class BotonQuitarRenderer extends JButton implements javax.swing.table.TableCellRenderer {
         BotonQuitarRenderer() {
@@ -543,8 +501,7 @@ public class VistaVentas extends JPanel {
             setBorderPainted(false);
         }
         @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                         boolean hasFocus, int row, int column) {
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             return this;
         }
     }
@@ -560,10 +517,15 @@ public class VistaVentas extends JPanel {
             boton.setFocusPainted(false);
             boton.setBorderPainted(false);
             boton.addActionListener(e -> {
-                DefaultTableModel modelo = (DefaultTableModel) tablaCarrito.getModel();
-                if (filaActual >= 0 && filaActual < modelo.getRowCount()) {
-                    modelo.removeRow(filaActual);
-                    recalcularSubtotal();
+                List<Venta.ItemCarrito> itemsActuales = new ArrayList<>(ventaActual.getDetalleCarrito());
+                if (filaActual >= 0 && filaActual < itemsActuales.size()) {
+                    itemsActuales.remove(filaActual);
+
+                    ventaActual = new Venta();
+                    for (Venta.ItemCarrito item : itemsActuales) {
+                        ventaActual.agregarProducto(item.getProducto(), item.getCantidad());
+                    }
+                    actualizarVistaCarrito();
                 }
                 fireEditingStopped();
             });
@@ -574,10 +536,7 @@ public class VistaVentas extends JPanel {
             filaActual = row;
             return boton;
         }
-
         @Override
-        public Object getCellEditorValue() {
-            return "−";
-        }
+        public Object getCellEditorValue() { return "−"; }
     }
 }

@@ -1,8 +1,11 @@
 package GUI.Form;
 
 import GUI.Style;
+import SistemaVentas.Inventario;
+import SistemaVentas.Producto;
 import java.awt.*;
-import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -20,8 +23,8 @@ public class VistaInventario extends JPanel {
     public JButton btnEliminar = new JButton("- Eliminar");
     private JTable tabla;
 
-    private static final String RUTA_ARCHIVO =
-            "C:\\PedroDonosoEPN\\Programacion II\\ProyectoProgramacion2doBimestre\\src\\datos_inventario.txt";
+    // Instanciamos la clase que se encargará de la lógica de negocio y archivos
+    private Inventario gestionInventario = new Inventario();
 
     public VistaInventario() {
         setLayout(new BorderLayout());
@@ -31,16 +34,18 @@ public class VistaInventario extends JPanel {
     }
 
     private void configurarAcciones() {
-        btnVolver.addActionListener(e -> {
+        // 1. CAMBIO: Botón volver adaptado al diseño de pantalla completa
+       btnVolver.addActionListener(e -> {
             JFrame ventanaPrincipal = (JFrame) SwingUtilities.getWindowAncestor(this);
-            ventanaPrincipal.getContentPane().removeAll();
-            ventanaPrincipal.add(new MenuPanel(), BorderLayout.WEST);
-            ventanaPrincipal.add(new MainPanel(), BorderLayout.CENTER);
+            Container cont = ventanaPrincipal.getContentPane();
+            cont.removeAll();
+            cont.setLayout(new BorderLayout());
+            cont.add(new MenuPanel(), BorderLayout.CENTER);  // ✅ Corregido
             ventanaPrincipal.revalidate();
             ventanaPrincipal.repaint();
-        });
+                });
 
-        // ---- AGREGAR: ahora abre un formulario modal en vez de crear una fila vacía ----
+        // ---- AGREGAR ----
         btnAgregar.addActionListener(e -> {
             JFrame ventanaPrincipal = (JFrame) SwingUtilities.getWindowAncestor(this);
             DialogoProducto dialogo = new DialogoProducto(ventanaPrincipal);
@@ -48,9 +53,21 @@ public class VistaInventario extends JPanel {
 
             String[] datos = dialogo.getDatosValidados();
             if (datos != null) {
+                // 1. Creamos el objeto Producto
+                Producto nuevoProducto = new Producto(
+                        datos[0], 
+                        datos[1], 
+                        Integer.parseInt(datos[2]), 
+                        Double.parseDouble(datos[3]), 
+                        datos[4]
+                );
+
+                // 2. Le decimos al cerebro que lo guarde en el archivo
+                gestionInventario.agregarProducto(nuevoProducto);
+
+                // 3. Actualizamos la tabla visualmente
                 DefaultTableModel modelo = (DefaultTableModel) tabla.getModel();
-                modelo.addRow(datos);
-                sobreescribirArchivo(modelo);
+                cargarDatos(modelo);
 
                 // Feedback visual: seleccionar y hacer scroll hasta la fila recién creada
                 int nuevaFila = modelo.getRowCount() - 1;
@@ -59,7 +76,7 @@ public class VistaInventario extends JPanel {
             }
         });
 
-        // ---- ELIMINAR: ahora pide confirmación antes de borrar ----
+        // ---- ELIMINAR ----
         btnEliminar.addActionListener(e -> {
             int filaSeleccionada = tabla.getSelectedRow();
             if (filaSeleccionada == -1) {
@@ -80,11 +97,14 @@ public class VistaInventario extends JPanel {
 
             if (confirmacion == JOptionPane.YES_OPTION) {
                 modelo.removeRow(filaSeleccionada);
-                sobreescribirArchivo(modelo);
+                // Le pasamos toda la tabla actualizada al cerebro para que reescriba el archivo
+                guardarTablaEnInventario(modelo);
+                
+                // 2. CAMBIO: Desactivamos el botón porque la selección se ha eliminado
+                btnEliminar.setEnabled(false);
             }
         });
 
-        // ---- El botón Eliminar refleja siempre si hay algo seleccionable ----
         btnEliminar.setEnabled(false);
     }
 
@@ -122,17 +142,17 @@ public class VistaInventario extends JPanel {
         panelAcciones.add(btnEliminar);
 
         String[] columnas = {"Nombre", "Código", "Cantidad en Stock", "Precio", "Descripción / Reporte"};
-        // No editable directamente sobre la celda: ahora todo pasa por el formulario validado
         DefaultTableModel modeloTabla = new DefaultTableModel(null, columnas) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
+        
         cargarDatos(modeloTabla);
 
         modeloTabla.addTableModelListener(e -> {
-            if (e.getType() == TableModelEvent.UPDATE) sobreescribirArchivo(modeloTabla);
+            if (e.getType() == TableModelEvent.UPDATE) guardarTablaEnInventario(modeloTabla);
         });
 
         tabla = new JTable(modeloTabla);
@@ -146,7 +166,6 @@ public class VistaInventario extends JPanel {
         tabla.setShowVerticalLines(false);
         tabla.setGridColor(Style.COLOR_BORDER);
 
-        // Habilita/deshabilita "Eliminar" según haya o no una fila seleccionada
         tabla.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 btnEliminar.setEnabled(tabla.getSelectedRow() != -1);
@@ -160,6 +179,46 @@ public class VistaInventario extends JPanel {
         panelCentral.add(scrollPane, BorderLayout.CENTER);
         return panelCentral;
     }
+
+    // ========================================================================
+    // MÉTODOS DE INTEGRACIÓN CON LA CLASE INVENTARIO
+    // ========================================================================
+
+    private void cargarDatos(DefaultTableModel modeloTabla) {
+        modeloTabla.setRowCount(0); 
+        
+        List<Producto> productos = gestionInventario.obtenerProductos();
+        
+        for (Producto p : productos) {
+            modeloTabla.addRow(new Object[]{
+                p.getNombre(), 
+                p.getCodigo(), 
+                String.valueOf(p.getCantidad()), 
+                String.format(Locale.US, "%.2f", p.getPrecio()), 
+                p.getDescripcion()
+            });
+        }
+    }
+
+    private void guardarTablaEnInventario(DefaultTableModel modeloTabla) {
+        List<Producto> listaActualizada = new ArrayList<>();
+        
+        for (int i = 0; i < modeloTabla.getRowCount(); i++) {
+            String nombre = String.valueOf(modeloTabla.getValueAt(i, 0));
+            String codigo = String.valueOf(modeloTabla.getValueAt(i, 1));
+            int cantidad = Integer.parseInt(String.valueOf(modeloTabla.getValueAt(i, 2)));
+            double precio = Double.parseDouble(String.valueOf(modeloTabla.getValueAt(i, 3)));
+            String descripcion = String.valueOf(modeloTabla.getValueAt(i, 4));
+            
+            listaActualizada.add(new Producto(nombre, codigo, cantidad, precio, descripcion));
+        }
+        
+        gestionInventario.guardarTodo(listaActualizada);
+    }
+
+    // ========================================================================
+    // MÉTODOS VISUALES
+    // ========================================================================
 
     private void configurarBotonPlano(JButton btn) {
         btn.setFont(Style.FONT_BOLD);
@@ -193,44 +252,10 @@ public class VistaInventario extends JPanel {
         });
     }
 
-    private void cargarDatos(DefaultTableModel modeloTabla) {
-        try (BufferedReader br = new BufferedReader(new FileReader(RUTA_ARCHIVO))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                // El límite -1 evita que Java descarte campos vacíos al final
-                // (por ejemplo, cuando la descripción queda en blanco)
-                String[] datos = linea.split(",", -1);
-                if (datos.length == 5) modeloTabla.addRow(datos);
-            }
-        } catch (IOException e) {
-            Style.showMsgError("No se pudo leer el archivo de inventario:\n" + e.getMessage());
-        }
-    }
+    // ========================================================================
+    // CLASE MODAL
+    // ========================================================================
 
-    private void sobreescribirArchivo(DefaultTableModel modeloTabla) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(RUTA_ARCHIVO))) {
-            for (int i = 0; i < modeloTabla.getRowCount(); i++) {
-                String fila = "";
-                for (int j = 0; j < modeloTabla.getColumnCount(); j++) {
-                    Object valor = modeloTabla.getValueAt(i, j);
-                    fila += (valor != null ? valor.toString() : "");
-                    if (j < modeloTabla.getColumnCount() - 1) fila += ",";
-                }
-                if (!fila.equals(",,,,")) {
-                    bw.write(fila);
-                    bw.newLine();
-                }
-            }
-        } catch (IOException e) {
-            Style.showMsgError("No se pudo guardar en el archivo:\n" + e.getMessage());
-        }
-    }
-
-    /**
-     * Formulario modal para agregar un producto nuevo.
-     * Valida los campos antes de permitir guardar, así nunca llega
-     * información incompleta o inválida a la tabla/archivo.
-     */
     private static class DialogoProducto extends JDialog {
 
         private final JTextField txtNombre = new JTextField(20);
@@ -250,9 +275,7 @@ public class VistaInventario extends JPanel {
             JPanel form = new JPanel(new GridLayout(5, 2, 10, 12));
             form.setBorder(new EmptyBorder(20, 20, 10, 20));
 
-            // Solo permite escribir dígitos enteros: bloquea letras, comas y puntos desde el teclado
             aplicarFiltroEntero(txtCantidad);
-            // Solo permite dígitos y un único punto decimal: la coma queda bloqueada, no se acepta ni se corrige después
             aplicarFiltroDecimal(txtPrecio);
 
             form.add(new JLabel("Nombre:"));
@@ -282,7 +305,6 @@ public class VistaInventario extends JPanel {
             btnGuardar.addActionListener(e -> validarYGuardar());
             btnCancelar.addActionListener(e -> dispose());
 
-            // Enter guarda, Escape cancela: coincide con lo que el usuario espera de un formulario
             getRootPane().setDefaultButton(btnGuardar);
             getRootPane().registerKeyboardAction(
                     e -> dispose(),
@@ -339,12 +361,10 @@ public class VistaInventario extends JPanel {
             lblError.setText(mensaje);
         }
 
-        /** Devuelve los datos ya validados, o null si el usuario canceló. */
         String[] getDatosValidados() {
             return datosValidados;
         }
 
-        /** Bloquea todo lo que no sea un dígito (0-9). Ideal para cantidades enteras. */
         private void aplicarFiltroEntero(JTextField campo) {
             ((PlainDocument) campo.getDocument()).setDocumentFilter(new DocumentFilter() {
                 @Override
@@ -358,18 +378,12 @@ public class VistaInventario extends JPanel {
             });
         }
 
-        /**
-         * Bloquea cualquier carácter que no sea dígito o punto, y permite como máximo
-         * un solo punto decimal. La coma queda bloqueada desde el teclado: el usuario
-         * ve de inmediato que no se escribe, en vez de que el programa la "corrija" en silencio.
-         */
         private void aplicarFiltroDecimal(JTextField campo) {
             ((PlainDocument) campo.getDocument()).setDocumentFilter(new DocumentFilter() {
                 private boolean esValido(FilterBypass fb, int offset, int length, String textoNuevo) throws BadLocationException {
                     if (!textoNuevo.matches("[0-9.]*")) return false;
                     String actual = fb.getDocument().getText(0, fb.getDocument().getLength());
                     String resultado = actual.substring(0, offset) + textoNuevo + actual.substring(offset + length);
-                    // Como máximo un punto en todo el campo
                     return resultado.chars().filter(c -> c == '.').count() <= 1;
                 }
 

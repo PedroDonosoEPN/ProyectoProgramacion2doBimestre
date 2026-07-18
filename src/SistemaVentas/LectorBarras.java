@@ -1,3 +1,4 @@
+package SistemaVentas;
 import java.util.Scanner;
 
 public class LectorBarras {

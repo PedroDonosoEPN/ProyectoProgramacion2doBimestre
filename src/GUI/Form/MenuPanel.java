@@ -1,108 +1,172 @@
 package GUI.Form;
 
-import GUI.Style;
-import java.awt.Component;
-import java.awt.Dimension;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 public class MenuPanel extends JPanel {
-    
-    public JButton 
-            btnVentas = new JButton("Ventas"),
-            btnInventario = new JButton("Inventario");
 
     public MenuPanel() {
-        customizeComponent();
+        // Permitimos que se dibuje el degradado personalizado
+        setOpaque(false); 
+        setLayout(new BorderLayout());
+
+        // 1. TÍTULO DEL SISTEMA
+        JPanel panelHeader = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        panelHeader.setOpaque(false);
+        panelHeader.setBorder(new EmptyBorder(60, 0, 0, 0)); 
+
+        JLabel lblTituloSistema = new JLabel("SISTEMA DE VENTAS");
+        lblTituloSistema.setFont(new Font("Segoe UI", Font.BOLD, 38));
+        lblTituloSistema.setForeground(Color.WHITE); 
+        panelHeader.add(lblTituloSistema);
+        add(panelHeader, BorderLayout.NORTH);
+
+        // 2. CONTENEDOR CENTRAL DE TARJETAS
+        JPanel panelContenedorLector = new JPanel(new GridBagLayout());
+        panelContenedorLector.setOpaque(false);
+        
+        JPanel panelTarjetas = new JPanel(new GridLayout(1, 2, 45, 0));
+        panelTarjetas.setOpaque(false);
+
+        // Tarjeta de Ventas
+        JPanel tarjetaVentas = crearTarjeta(
+            "🛒", 
+            "Módulo de Ventas", 
+            "Registrar salidas, escanear códigos de barras y generar facturas automáticas.",
+            new Color(46, 204, 113), 
+            () -> abrirModuloVentas()
+        );
+
+        // Tarjeta de Inventario
+        JPanel tarjetaInventario = crearTarjeta(
+            "📦", 
+            "Control de Inventario", 
+            "Administrar el stock de productos, agregar nuevas existencias y reportes.",
+            new Color(52, 152, 219), 
+            () -> abrirModuloInventario()
+        );
+
+        panelTarjetas.add(tarjetaVentas);
+        panelTarjetas.add(tarjetaInventario);
+
+        panelContenedorLector.add(panelTarjetas, new GridBagConstraints());
+        add(panelContenedorLector, BorderLayout.CENTER);
     }
-    
-    private void customizeComponent() {
-        setBackground(Style.COLOR_PANEL_LATERAL);
-        setPreferredSize(new Dimension(220, 0)); 
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBorder(new EmptyBorder(30, 20, 30, 20)); 
 
-        // Títulos
-        JLabel lblTitulo = new JLabel("Sistema");
-        JLabel lblSubtitulo = new JLabel("Ventas");
+    @Override
+    protected void paintComponent(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g.create();
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         
-        lblTitulo.setFont(Style.FONT_TITULO);
-        lblTitulo.setForeground(Style.COLOR_FONT_BG_OSCURO); 
+        Color colorTop = new Color(24, 32, 46); 
+        Color colorBottom = new Color(14, 18, 24);
+        
+        GradientPaint gp = new GradientPaint(0, 0, colorTop, 0, getHeight(), colorBottom);
+        g2d.setPaint(gp);
+        g2d.fillRect(0, 0, getWidth(), getHeight());
+        g2d.dispose();
+        
+        super.paintComponent(g);
+    }
+
+    private JPanel crearTarjeta(String icono, String titulo, String descripcion, Color colorHover, Runnable accion) {
+        JPanel tarjeta = new JPanel();
+        tarjeta.setPreferredSize(new Dimension(310, 260));
+        tarjeta.setBackground(Color.WHITE);
+        tarjeta.setLayout(new BoxLayout(tarjeta, BoxLayout.Y_AXIS));
+        tarjeta.setBorder(BorderFactory.createCompoundBorder(
+            new LineBorder(new Color(230, 235, 242), 1, true),
+            new EmptyBorder(30, 25, 30, 25)
+        ));
+        tarjeta.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        JLabel lblIcono = new JLabel(icono);
+        lblIcono.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 55));
+        lblIcono.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel lblTitulo = new JLabel(titulo);
+        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        lblTitulo.setForeground(new Color(44, 62, 80));
         lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
-        lblSubtitulo.setFont(Style.FONT_TITULO);
-        lblSubtitulo.setForeground(Style.COLOR_FONT_BG_OSCURO);
-        lblSubtitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Aplicamos el estilo plano
-        configurarBotonPlano(btnVentas);
-        configurarBotonPlano(btnInventario);
+        JLabel lblDesc = new JLabel("<html><body style='text-align: center;'>" + descripcion + "</body></html>");
+        lblDesc.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        lblDesc.setForeground(new Color(127, 140, 141));
+        lblDesc.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Ensamblaje visual
-        add(lblTitulo);
-        add(lblSubtitulo);
-        add(Box.createVerticalGlue()); 
-        add(btnVentas);
-        add(Box.createRigidArea(new Dimension(0, 20))); 
-        add(btnInventario);
-        add(Box.createVerticalGlue());
+        tarjeta.add(lblIcono);
+        tarjeta.add(Box.createRigidArea(new Dimension(0, 15)));
+        tarjeta.add(lblTitulo);
+        tarjeta.add(Box.createRigidArea(new Dimension(0, 12)));
+        tarjeta.add(lblDesc);
 
-        // Acción del botón Ventas
-        btnVentas.addActionListener(e -> {
-            JFrame ventanaPrincipal = (JFrame) SwingUtilities.getWindowAncestor(this);
-            ventanaPrincipal.getContentPane().removeAll();
-            ventanaPrincipal.add(new VistaVentas());
-            ventanaPrincipal.revalidate();
-            ventanaPrincipal.repaint();
-        });
+        tarjeta.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                tarjeta.setBackground(new Color(252, 253, 255));
+                tarjeta.setBorder(BorderFactory.createCompoundBorder(
+                    new LineBorder(colorHover, 2, true),
+                    new EmptyBorder(29, 24, 29, 24)
+                ));
+                lblTitulo.setForeground(colorHover);
+            }
 
-        // Acción del botón Inventario
-        btnInventario.addActionListener(e -> {
-            String input = javax.swing.JOptionPane.showInputDialog(
-                this, 
-                "Ingrese contraseña:", 
-                "Acceso a Módulo", 
-                javax.swing.JOptionPane.QUESTION_MESSAGE
-            );
+            @Override
+            public void mouseExited(MouseEvent e) {
+                tarjeta.setBackground(Color.WHITE);
+                tarjeta.setBorder(BorderFactory.createCompoundBorder(
+                    new LineBorder(new Color(230, 235, 242), 1, true),
+                    new EmptyBorder(30, 25, 30, 25)
+                ));
+                lblTitulo.setForeground(new Color(44, 62, 80));
+            }
 
-            if (input != null) {
-                ValidadorUsuarios validador = new ValidadorUsuarios();
-                
-                if (validador.validarAccesoInventario(input)) {
-                    Style.showMsg("Contraseña correcta. Bienvenido al inventario.");
-                    
-                    // Lógica para cambiar de pantalla
-                    JFrame ventanaPrincipal = (JFrame) SwingUtilities.getWindowAncestor(this);
-                    ventanaPrincipal.getContentPane().removeAll();
-                    ventanaPrincipal.add(new VistaInventario());
-                    ventanaPrincipal.revalidate();
-                    ventanaPrincipal.repaint();
-                    
-                } else {
-                    Style.showMsgError("Contraseña incorrecta. Acceso denegado.");
-                }
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                accion.run();
             }
         });
+
+        return tarjeta;
     }
 
-    private void configurarBotonPlano(JButton btn) {
-        btn.setFont(Style.FONT_BOLD);
-        btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40)); 
-        btn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btn.setCursor(Style.CURSOR_HAND);
-        
-        btn.setFocusPainted(false);      
-        btn.setBorderPainted(false);     
-        btn.setContentAreaFilled(false); 
-        btn.setOpaque(true);             
-        
-        btn.setBackground(Style.COLOR_BOTON_NORMAL);
-        btn.setForeground(Style.COLOR_FONT_BG_OSCURO); 
+    private void abrirModuloVentas() {
+        JFrame ventanaPrincipal = (JFrame) SwingUtilities.getWindowAncestor(this);
+        Container cont = ventanaPrincipal.getContentPane();
+        cont.removeAll();
+        cont.setLayout(new BorderLayout()); 
+        cont.add(new VistaVentas(), BorderLayout.CENTER);
+        ventanaPrincipal.revalidate();
+        ventanaPrincipal.repaint();
+    }
+
+    private void abrirModuloInventario() {
+        JPasswordField txtPassword = new JPasswordField();
+        int ordenarConfirmacion = JOptionPane.showConfirmDialog(
+            this, 
+            txtPassword, 
+            "🔐 Ingrese la contraseña de Administrador:", 
+            JOptionPane.OK_CANCEL_OPTION, 
+            JOptionPane.PLAIN_MESSAGE
+        );
+
+        if (ordenarConfirmacion == JOptionPane.OK_OPTION) {
+            String passwordIngresada = new String(txtPassword.getPassword());
+            if (passwordIngresada.equals("admin123")) { 
+                JFrame ventanaPrincipal = (JFrame) SwingUtilities.getWindowAncestor(this);
+                Container cont = ventanaPrincipal.getContentPane();
+                cont.removeAll();
+                cont.setLayout(new BorderLayout()); 
+                cont.add(new VistaInventario(), BorderLayout.CENTER);
+                ventanaPrincipal.revalidate();
+                ventanaPrincipal.repaint();
+            } else {
+                JOptionPane.showMessageDialog(this, "Contraseña incorrecta. Acceso denegado.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 }
