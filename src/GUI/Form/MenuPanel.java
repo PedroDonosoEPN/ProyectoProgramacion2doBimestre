@@ -53,6 +53,15 @@ public class MenuPanel extends JPanel {
         add(btnInventario);
         add(Box.createVerticalGlue());
 
+        // Acción del botón Ventas
+        btnVentas.addActionListener(e -> {
+            JFrame ventanaPrincipal = (JFrame) SwingUtilities.getWindowAncestor(this);
+            ventanaPrincipal.getContentPane().removeAll();
+            ventanaPrincipal.add(new VistaVentas());
+            ventanaPrincipal.revalidate();
+            ventanaPrincipal.repaint();
+        });
+
         // Acción del botón Inventario
         btnInventario.addActionListener(e -> {
             String input = javax.swing.JOptionPane.showInputDialog(

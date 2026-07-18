@@ -1,5 +1,5 @@
-Paracetamol,MED-001,130,1.25,Caja de 20 tabletas 500mg
 Ibuprofeno,MED-002,40,2.50,Antiinflamatorio 400mg
 Alcohol,INS-001,45,1.00,Botella 250ml 70 grados
 Vendas,INS-002,200,0.50,Venda elástica 5cm
-Termometro,EQP-001,15,4.50,Termómetro digital
+12,13,4,5.00,
+Pan,34,44,2.00,po

@@ -17,9 +17,9 @@ public abstract class Style {
     public static final URL URL_LOGO   = Style.class.getResource("/GUI/Resource/Img/Logo.png");
     public static final URL URL_SPLASH = Style.class.getResource("/GUI/Resource/Img/Splah.png");
 
-    public static final Color COLOR_FONDO_PRINCIPAL = new Color(248, 249, 250); 
-    public static final Color COLOR_PANEL_LATERAL = new Color(139, 0, 0); 
-    public static final Color COLOR_BOTON_NORMAL = new Color(180, 20, 20); 
+public static final Color COLOR_PANEL_LATERAL = new Color(160, 25, 25); 
+public static final Color COLOR_BOTON_NORMAL = new Color(200, 40, 40); 
+public static final Color COLOR_FONDO_PRINCIPAL = new Color(245, 245, 245); // Gris muy suave`
     public static final Color COLOR_BOTON_HOVER = new Color(220, 50, 50); 
     public static final Color COLOR_BOTON_SECUNDARIO = new Color(224, 224, 224); 
 
