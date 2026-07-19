@@ -21,7 +21,7 @@ public class VistaInventario extends JPanel {
     private JTable tabla;
 
     private static final String RUTA_ARCHIVO =
-            "C:\\PedroDonosoEPN\\Programacion II\\ProyectoProgramacion2doBimestre\\src\\datos_inventario.txt";
+            "src\\datos_inventario.txt";
 
     public VistaInventario() {
         setLayout(new BorderLayout());
