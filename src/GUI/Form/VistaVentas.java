@@ -86,6 +86,7 @@ public class VistaVentas extends JPanel {
                 ventaActual.agregarProducto(item.getProducto(), item.getCantidad());
                 actualizarVistaCarrito();
             }
+            txtEscaner.requestFocusInWindow();
         });
 
         btnTerminar.addActionListener(e -> {
@@ -127,6 +128,7 @@ public class VistaVentas extends JPanel {
                     Style.showMsgError(ex.getMessage());
                 }
             }
+            txtEscaner.requestFocusInWindow();
         });
     }
 
@@ -196,41 +198,29 @@ public class VistaVentas extends JPanel {
         panelSuperior.setBackground(Style.COLOR_FONDO_PRINCIPAL);
 
         // ---- Zona de escaneo mejorada ----
+        // ---- Zona de escaneo: sin caja visible, el lector USB actúa directo ----
         JPanel filaEscaner = new JPanel(new BorderLayout(10, 0));
         filaEscaner.setBackground(Style.COLOR_FONDO_PRINCIPAL);
         filaEscaner.setBorder(new EmptyBorder(0, 0, 5, 0));
 
-        JLabel lblIconoEscaner = new JLabel("📷");
-        lblIconoEscaner.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 22));
+        JLabel lblEstadoEscaner = new JLabel("  ■ Listo para escanear — acerca el código de barras al lector");
+        lblEstadoEscaner.setFont(Style.FONT_BOLD);
+        lblEstadoEscaner.setForeground(new Color(39, 174, 96));
+        lblEstadoEscaner.setBorder(new EmptyBorder(8, 4, 8, 4));
 
-        JPanel panelTextoEscaner = new JPanel();
-        panelTextoEscaner.setLayout(new BoxLayout(panelTextoEscaner, BoxLayout.Y_AXIS));
-        panelTextoEscaner.setBackground(Style.COLOR_FONDO_PRINCIPAL);
-
-        JLabel lblEscaner = new JLabel("Escanear producto");
-        lblEscaner.setFont(Style.FONT_BOLD);
-
-        JLabel lblHintEscaner = new JLabel("Enfoca aquí y escanea el código de barras, o escríbelo y presiona Enter");
-        lblHintEscaner.setFont(Style.FONT.deriveFont(Font.PLAIN, 11f));
-        lblHintEscaner.setForeground(new Color(127, 140, 141));
-
-        panelTextoEscaner.add(lblEscaner);
-        panelTextoEscaner.add(lblHintEscaner);
-
+        // Campo real que recibe las teclas del lector.
+        // OJO: no se usa setVisible(false) porque un componente invisible NO puede
+        // recibir foco en Swing. En su lugar lo hacemos de 1x1 px y sin bordes,
+        // para que sea imperceptible mientras sigue siendo funcional.
         txtEscaner = new JTextField();
-        txtEscaner.setFont(Style.FONT.deriveFont(16f));
-        txtEscaner.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(52, 152, 219), 2, true),
-                new EmptyBorder(10, 14, 10, 14)
-        ));
+        txtEscaner.setPreferredSize(new Dimension(1, 1));
+        txtEscaner.setBorder(null);
+        txtEscaner.setBackground(Style.COLOR_FONDO_PRINCIPAL);
+        txtEscaner.setForeground(Style.COLOR_FONDO_PRINCIPAL);
+        txtEscaner.setCaretColor(Style.COLOR_FONDO_PRINCIPAL);
 
-        JPanel filaSuperiorEscaner = new JPanel(new BorderLayout(12, 0));
-        filaSuperiorEscaner.setBackground(Style.COLOR_FONDO_PRINCIPAL);
-        filaSuperiorEscaner.add(lblIconoEscaner, BorderLayout.WEST);
-        filaSuperiorEscaner.add(panelTextoEscaner, BorderLayout.CENTER);
-
-        filaEscaner.add(filaSuperiorEscaner, BorderLayout.NORTH);
-        filaEscaner.add(txtEscaner, BorderLayout.CENTER);
+        filaEscaner.add(lblEstadoEscaner, BorderLayout.CENTER);
+        filaEscaner.add(txtEscaner, BorderLayout.SOUTH);
 
         JPanel filaBotones = new JPanel(new BorderLayout());
         filaBotones.setBackground(Style.COLOR_FONDO_PRINCIPAL);
@@ -288,6 +278,16 @@ public class VistaVentas extends JPanel {
 
         panelCentral.add(panelSuperior, BorderLayout.NORTH);
         panelCentral.add(scrollPane, BorderLayout.CENTER);
+
+        // Si el cajero hace clic en cualquier parte del área de trabajo,
+        // el foco regresa al campo oculto para que el lector USB siga funcionando.
+        panelCentral.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                txtEscaner.requestFocusInWindow();
+            }
+        });
+
         return panelCentral;
     }
 
@@ -528,6 +528,7 @@ public class VistaVentas extends JPanel {
                     actualizarVistaCarrito();
                 }
                 fireEditingStopped();
+                txtEscaner.requestFocusInWindow();
             });
         }
 

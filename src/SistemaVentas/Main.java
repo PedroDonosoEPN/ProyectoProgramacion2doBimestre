@@ -1,5 +1,4 @@
 package  SistemaVentas;
-import GUI.Form.MainPanel;
 import GUI.Form.MenuPanel;
 import java.awt.BorderLayout;
 import javax.swing.JFrame;
