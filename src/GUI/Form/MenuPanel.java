@@ -33,8 +33,10 @@ public class MenuPanel extends JPanel {
         panelTarjetas.setOpaque(false);
 
         // Tarjeta de Ventas
+        ImageIcon iconoCarrito = new ImageIcon(getClass().getResource("/GUI/Resource/Img/carrito.png"));
+        Image imagenCarrito = iconoCarrito.getImage().getScaledInstance(55, 55, Image.SCALE_SMOOTH);
         JPanel tarjetaVentas = crearTarjeta(
-            "🛒", 
+            new ImageIcon(imagenCarrito),
             "Módulo de Ventas", 
             "Registrar salidas, escanear códigos de barras y generar facturas automáticas.",
             new Color(46, 204, 113), 
@@ -42,8 +44,10 @@ public class MenuPanel extends JPanel {
         );
 
         // Tarjeta de Inventario
+        ImageIcon iconoCaja = new ImageIcon(getClass().getResource("/GUI/Resource/Img/caja.png"));
+        Image imagenCaja = iconoCaja.getImage().getScaledInstance(55, 55, Image.SCALE_SMOOTH);
         JPanel tarjetaInventario = crearTarjeta(
-            "📦", 
+            new ImageIcon(imagenCaja),
             "Control de Inventario", 
             "Administrar el stock de productos, agregar nuevas existencias y reportes.",
             new Color(52, 152, 219), 
@@ -73,7 +77,7 @@ public class MenuPanel extends JPanel {
         super.paintComponent(g);
     }
 
-    private JPanel crearTarjeta(String icono, String titulo, String descripcion, Color colorHover, Runnable accion) {
+    private JPanel crearTarjeta(JLabel lblIcono2, String titulo, String descripcion, Color colorHover, Runnable accion) {
         JPanel tarjeta = new JPanel();
         tarjeta.setPreferredSize(new Dimension(310, 260));
         tarjeta.setBackground(Color.WHITE);
@@ -84,8 +88,7 @@ public class MenuPanel extends JPanel {
         ));
         tarjeta.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        JLabel lblIcono = new JLabel(icono);
-        lblIcono.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 55));
+        JLabel lblIcono = lblIcono2;
         lblIcono.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel lblTitulo = new JLabel(titulo);
@@ -132,6 +135,19 @@ public class MenuPanel extends JPanel {
         });
 
         return tarjeta;
+    }
+
+   /*  private JPanel crearTarjeta(String icono, String titulo, String descripcion, Color colorHover, Runnable accion) {
+        JLabel lblIcono = new JLabel(icono);
+        lblIcono.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 55));
+        lblIcono.setAlignmentX(Component.CENTER_ALIGNMENT);
+        return crearTarjeta(lblIcono, titulo, descripcion, colorHover, accion);
+    }
+*/
+    private JPanel crearTarjeta(Icon icono, String titulo, String descripcion, Color colorHover, Runnable accion) {
+        JLabel lblIcono = new JLabel(icono);
+        lblIcono.setAlignmentX(Component.CENTER_ALIGNMENT);
+        return crearTarjeta(lblIcono, titulo, descripcion, colorHover, accion);
     }
 
     private void abrirModuloVentas() {

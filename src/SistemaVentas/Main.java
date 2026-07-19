@@ -3,20 +3,22 @@ import GUI.Form.MenuPanel;
 import java.awt.BorderLayout;
 import javax.swing.JFrame;
 
+import GUI.Form.MainForm;
+/**
+ * Programa principal para iniciar la aplicación de ventas e inventario.
+ * Instancia la ventana principal y muestra el menú de opciones.
+ * Void main(String[] args) es el punto de entrada del programa.
+ * Crea un objeto MainForm con el título "Punto de Venta e Inventario"
+ */
 public class Main {
+    /**
+    * Punto de entrada del programa.
+    * @param args Argumentos de línea de comandos.
+    */
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                JFrame ventanaPrincipal = new JFrame("Punto de Venta e Inventario");
-                ventanaPrincipal.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                ventanaPrincipal.setSize(1000, 600);
-                ventanaPrincipal.setLayout(new BorderLayout());
-
-                MenuPanel menu = new MenuPanel();
-                ventanaPrincipal.add(menu, BorderLayout.CENTER);
-
-                ventanaPrincipal.setLocationRelativeTo(null);
-                ventanaPrincipal.setVisible(true);
+                new MainForm("Punto de Venta e Inventario");
             }
         });
     }

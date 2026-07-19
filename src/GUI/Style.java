@@ -12,12 +12,13 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
 public abstract class Style {
-    public static final URL URL_MAIN   = Style.class.getResource("/GUI/Resource/Img/Main.png");
-    public static final URL URL_MENU   = Style.class.getResource("/GUI/Resource/Img/Menu.png");
-    public static final URL URL_LOGO   = Style.class.getResource("/GUI/Resource/Img/Logo.png");
-    public static final URL URL_SPLASH = Style.class.getResource("/GUI/Resource/Img/Splah.png");
+    public static final URL URL_MAIN      = Style.class.getResource("/GUI/Resource/Img/Main.png");
+    public static final URL URL_MENU      = Style.class.getResource("/GUI/Resource/Img/Main.png");
+    public static final URL URL_LOGO      = Style.class.getResource("/GUI/Resource/Img/Icon.png");
+    public static final URL URL_SPLASH    = Style.class.getResource("/GUI/Resource/Img/Icon.png");
+    public static final URL URL_APP_ICON  = Style.class.getResource("/GUI/Resource/Img/Icon.png");
 
-public static final Color COLOR_PANEL_LATERAL = new Color(160, 25, 25); 
+    public static final Color COLOR_PANEL_LATERAL = new Color(160, 25, 25); 
 public static final Color COLOR_BOTON_NORMAL = new Color(200, 40, 40); 
 public static final Color COLOR_FONDO_PRINCIPAL = new Color(245, 245, 245); // Gris muy suave`
     public static final Color COLOR_BOTON_HOVER = new Color(220, 50, 50); 
@@ -52,15 +53,19 @@ public static final Color COLOR_FONDO_PRINCIPAL = new Color(245, 245, 245); // G
         return new EmptyBorder(20, 20, 20, 20);
     }
 
+    public static final URL getAppIconUrl() {
+        return URL_APP_ICON;
+    }
+
     public static final void showMsg(String msg){
-        JOptionPane.showMessageDialog(null, msg, "😏 IABot", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(null, msg, "😏 SystemVentas", JOptionPane.INFORMATION_MESSAGE);
     }
     
     public static final void showMsgError(String msg){
-        JOptionPane.showMessageDialog(null, msg, "💀 IABot", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(null, msg, "💀 SystemVentas", JOptionPane.ERROR_MESSAGE);
     }
 
     public static final boolean showConfirmYesNo(String msg){
-        return (JOptionPane.showConfirmDialog(null, msg, "😞 IABot", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION);
+        return (JOptionPane.showConfirmDialog(null, msg, "😞 SystemVentas", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION);
     }
 }
