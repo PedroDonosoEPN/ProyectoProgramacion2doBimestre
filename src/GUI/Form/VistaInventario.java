@@ -22,8 +22,9 @@ import javax.swing.text.PlainDocument;
     */
 public class VistaInventario extends JPanel {
 
-    public JButton btnVolver = new JButton("Volver");
+    public JButton btnVolver = new JButton("✕ Cancelar");
     public JButton btnAgregar = new JButton("+ Agregar");
+    public JButton btnEditar = new JButton("/ Editar");
     public JButton btnEliminar = new JButton("- Eliminar");
     private JTable tabla;
 
@@ -43,8 +44,7 @@ public class VistaInventario extends JPanel {
     * Configura las acciones de los botones en la vista del inventario.
     */
     private void configurarAcciones() {
-        // 1. CAMBIO: Botón volver adaptado al diseño de pantalla completa
-       btnVolver.addActionListener(e -> {
+        btnVolver.addActionListener(e -> {
             JFrame ventanaPrincipal = (JFrame) SwingUtilities.getWindowAncestor(this);
             Container cont = ventanaPrincipal.getContentPane();
             cont.removeAll();
@@ -53,6 +53,8 @@ public class VistaInventario extends JPanel {
             ventanaPrincipal.revalidate();
             ventanaPrincipal.repaint();
         });
+
+        // ---- AGREGAR ----
         btnAgregar.addActionListener(e -> {
             JFrame ventanaPrincipal = (JFrame) SwingUtilities.getWindowAncestor(this);
             DialogoProducto dialogo = new DialogoProducto(ventanaPrincipal);
@@ -83,6 +85,39 @@ public class VistaInventario extends JPanel {
             }
         });
 
+        // ---- EDITAR ----
+        btnEditar.addActionListener(e -> {
+            int filaSeleccionada = tabla.getSelectedRow();
+            if (filaSeleccionada == -1) {
+                Style.showMsgError("Seleccione una fila para editar.");
+                return;
+            }
+
+            DefaultTableModel modelo = (DefaultTableModel) tabla.getModel();
+            String[] datosActuales = {
+                    String.valueOf(modelo.getValueAt(filaSeleccionada, 0)),
+                    String.valueOf(modelo.getValueAt(filaSeleccionada, 1)),
+                    String.valueOf(modelo.getValueAt(filaSeleccionada, 2)),
+                    String.valueOf(modelo.getValueAt(filaSeleccionada, 3)),
+                    String.valueOf(modelo.getValueAt(filaSeleccionada, 4))
+            };
+
+            JFrame ventanaPrincipal = (JFrame) SwingUtilities.getWindowAncestor(this);
+            DialogoProducto dialogo = new DialogoProducto(ventanaPrincipal, datosActuales);
+            dialogo.setVisible(true);
+
+            String[] datosNuevos = dialogo.getDatosValidados();
+            if (datosNuevos != null) {
+                modelo.setValueAt(datosNuevos[0], filaSeleccionada, 0);
+                modelo.setValueAt(datosNuevos[1], filaSeleccionada, 1);
+                modelo.setValueAt(datosNuevos[2], filaSeleccionada, 2);
+                modelo.setValueAt(datosNuevos[3], filaSeleccionada, 3);
+                modelo.setValueAt(datosNuevos[4], filaSeleccionada, 4);
+
+                guardarTablaEnInventario(modelo);
+            }
+        });
+
         // ---- ELIMINAR ----
         btnEliminar.addActionListener(e -> {
             int filaSeleccionada = tabla.getSelectedRow();
@@ -107,19 +142,34 @@ public class VistaInventario extends JPanel {
                 // Le pasamos toda la tabla actualizada al cerebro para que reescriba el archivo
                 guardarTablaEnInventario(modelo);
                 
-                // 2. CAMBIO: Desactivamos el botón porque la selección se ha eliminado
+                // Desactivamos los botones porque la selección se ha eliminado
                 btnEliminar.setEnabled(false);
+                btnEditar.setEnabled(false);
             }
         });
 
         btnEliminar.setEnabled(false);
+        btnEditar.setEnabled(false);
     }
     /**
     * Crea el panel lateral del módulo de inventario, que contiene un título y un botón para volver al menú principal. Se establece un diseño vertical utilizando BoxLayout y se aplican estilos visuales a los componentes, como colores, fuentes y márgenes.
     */
     private JPanel crearMenuLateral() {
-        JPanel panelMenu = new JPanel();
-        panelMenu.setBackground(Style.COLOR_PANEL_LATERAL);
+        JPanel panelMenu = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                Color colorTop = new Color(24, 32, 46);
+                Color colorBottom = new Color(14, 18, 24);
+                GradientPaint gp = new GradientPaint(0, 0, colorTop, 0, getHeight(), colorBottom);
+                g2d.setPaint(gp);
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+                g2d.dispose();
+                super.paintComponent(g);
+            }
+        };
+        panelMenu.setOpaque(false);
         panelMenu.setPreferredSize(new Dimension(220, 0));
         panelMenu.setLayout(new BoxLayout(panelMenu, BoxLayout.Y_AXIS));
         panelMenu.setBorder(new EmptyBorder(30, 20, 30, 20));
@@ -130,6 +180,8 @@ public class VistaInventario extends JPanel {
         lblModulo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         configurarBotonPlano(btnVolver);
+        btnVolver.setBackground(new Color(192, 57, 43));
+
         panelMenu.add(lblModulo);
         panelMenu.add(Box.createVerticalGlue());
         panelMenu.add(btnVolver);
@@ -148,9 +200,11 @@ public class VistaInventario extends JPanel {
         panelAcciones.setBackground(Style.COLOR_FONDO_PRINCIPAL);
 
         configurarBotonAccion(btnAgregar, new Color(39, 174, 96));
+        configurarBotonAccion(btnEditar, new Color(52, 152, 219));
         configurarBotonAccion(btnEliminar, new Color(192, 57, 43));
 
         panelAcciones.add(btnAgregar);
+        panelAcciones.add(btnEditar);
         panelAcciones.add(btnEliminar);
 
         String[] columnas = {"Nombre", "Código", "Cantidad en Stock", "Precio", "Descripción / Reporte"};
@@ -180,7 +234,9 @@ public class VistaInventario extends JPanel {
 
         tabla.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
-                btnEliminar.setEnabled(tabla.getSelectedRow() != -1);
+                boolean haySeleccion = tabla.getSelectedRow() != -1;
+                btnEliminar.setEnabled(haySeleccion);
+                btnEditar.setEnabled(haySeleccion);
             }
         });
 
@@ -287,13 +343,20 @@ public class VistaInventario extends JPanel {
         private final JLabel lblError = new JLabel(" ");
 
         private String[] datosValidados = null;
+        private final boolean modoEdicion;
     /**
     * Constructor de la clase DialogoProducto. Inicializa el cuadro de diálogo para agregar un nuevo producto, estableciendo su diseño, tamaño, comportamiento y agregando los componentes visuales necesarios para la entrada de datos del producto.
     * Se aplican filtros de entrada para los campos de cantidad y precio, permitiendo solo números enteros y decimales válidos, respectivamente. Además, se configuran los botones de guardar y cancelar, así como la acción predeterminada al presionar la tecla Enter y la acción de cierre al presionar la tecla Escape.
     * @param padre La ventana principal de la aplicación que actúa como padre del cuadro de diálogo, permitiendo que el cuadro de diálogo se muestre de manera modal y centrada sobre la ventana principal.
     */
         DialogoProducto(JFrame padre) {
-            super(padre, "Agregar producto", true);
+            this(padre, null);
+        }
+
+        // datosIniciales: {nombre, codigo, cantidad, precio, descripcion} o null para modo "agregar"
+        DialogoProducto(JFrame padre, String[] datosIniciales) {
+            super(padre, datosIniciales == null ? "Agregar producto" : "Editar producto", true);
+            this.modoEdicion = datosIniciales != null;
             setLayout(new BorderLayout(10, 10));
             setResizable(false);
 
@@ -302,6 +365,14 @@ public class VistaInventario extends JPanel {
 
             aplicarFiltroEntero(txtCantidad);
             aplicarFiltroDecimal(txtPrecio);
+
+            if (modoEdicion) {
+                txtNombre.setText(datosIniciales[0]);
+                txtCodigo.setText(datosIniciales[1]);
+                txtCantidad.setText(datosIniciales[2]);
+                txtPrecio.setText(datosIniciales[3]);
+                txtDescripcion.setText(datosIniciales[4]);
+            }
 
             form.add(new JLabel("Nombre:"));
             form.add(txtNombre);
@@ -317,7 +388,7 @@ public class VistaInventario extends JPanel {
             lblError.setForeground(new Color(192, 57, 43));
             lblError.setBorder(new EmptyBorder(0, 20, 0, 20));
 
-            JButton btnGuardar = new JButton("Guardar");
+            JButton btnGuardar = new JButton(modoEdicion ? "Guardar cambios" : "Guardar");
             JButton btnCancelar = new JButton("Cancelar");
             JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
             panelBotones.add(btnCancelar);

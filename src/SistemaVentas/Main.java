@@ -1,4 +1,7 @@
-package SistemaVentas;
+package  SistemaVentas;
+import GUI.Form.MenuPanel;
+import java.awt.BorderLayout;
+import javax.swing.JFrame;
 
 import GUI.Form.MainForm;
 /**
