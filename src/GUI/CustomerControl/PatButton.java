@@ -1,18 +1,21 @@
 package GUI.CustomerControl;
 
-import java.awt.Font;
+//import java.awt.Font;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.JButton;
-import javax.swing.SwingConstants;
+//import javax.swing.SwingConstants;
 
 import GUI.Style;
 
 import javax.swing.ImageIcon;
-
+    /**
+    * Representa un botón personalizado para la interfaz gráfica de usuario (GUI) de la aplicación. Extiende la clase JButton y proporciona métodos para personalizar el aspecto y comportamiento del botón, incluyendo el texto, el icono, los colores y las fuentes.
+    * Implementa la interfaz MouseListener para manejar eventos del mouse, como el cambio de color del texto al pasar el mouse sobre el botón.
+    */
 public class PatButton  extends JButton implements MouseListener {
     public PatButton(String text){
         customizeComponent(text);

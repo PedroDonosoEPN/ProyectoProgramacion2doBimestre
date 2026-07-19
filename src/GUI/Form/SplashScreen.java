@@ -14,7 +14,10 @@ public class SplashScreen {
     private static JProgressBar prbLoaging;
     private static ImageIcon    icoImagen ;
     private static JLabel       lblSplash ;
-
+    /**
+    * Muestra la pantalla de inicio (splash screen) de la aplicación. Crea una ventana sin bordes que contiene una imagen y una barra de progreso. La barra de progreso se actualiza gradualmente para simular el proceso de carga de la aplicación. Una vez que la barra de progreso alcanza el 100%, la ventana se oculta.
+    * Este método se utiliza para proporcionar una experiencia visual atractiva al usuario mientras la aplicación se inicia, mostrando un logotipo o imagen representativa de la aplicación junto con una barra de progreso que indica el estado de carga.
+    */
     public static void show() {
         try {
             frmSplash = new JFrame();

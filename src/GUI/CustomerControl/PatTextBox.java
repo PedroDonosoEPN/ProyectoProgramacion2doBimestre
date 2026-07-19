@@ -7,7 +7,11 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 
 import GUI.Style;
-
+    /**
+    * Representa un cuadro de texto personalizado para la interfaz gráfica de usuario (GUI) de la aplicación. Extiende la clase JTextField y proporciona métodos para personalizar el aspecto y comportamiento del cuadro de texto, incluyendo el borde, la fuente, el color del texto y del cursor, y los márgenes internos.
+    * Esta clase se utiliza para crear campos de entrada de datos en la GUI de la aplicación, permitiendo a los usuarios ingresar información de manera estructurada y visualmente atractiva.
+    * Proporciona métodos para establecer diferentes estilos de borde, como un borde rectangular o un borde inferior, según las necesidades del diseño de la interfaz.
+    */
 public class PatTextBox extends JTextField {
 
     public PatTextBox() {

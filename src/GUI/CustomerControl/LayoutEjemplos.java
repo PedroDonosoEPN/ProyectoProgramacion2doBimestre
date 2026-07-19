@@ -20,7 +20,10 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-
+    /**
+    * Clase que representa un ejemplo de diseño de interfaz gráfica utilizando GridBagLayout. Contiene métodos para agregar controles y componentes a un panel, así como ejemplos de cómo organizar los elementos en la interfaz.
+    * Esta clase sirve como referencia para la creación de interfaces gráficas más complejas.
+    */
 public class LayoutEjemplos {
 
     private PatLabel  
