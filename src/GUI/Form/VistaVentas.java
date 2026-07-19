@@ -31,7 +31,7 @@ public class VistaVentas extends JPanel {
     private Inventario gestionInventario = new Inventario();
     private Venta ventaActual = new Venta();
 
-    private static final String RUTA_VENTAS = "data/registro_ventas.txt";
+    private static final String RUTA_VENTAS = "data\\registro_ventas.txt";
     private static final int COL_ACCION = 3;
     /**
     * Constructor de la clase VistaVentas. Inicializa la interfaz gráfica de usuario (GUI) para la gestión de ventas, configurando el diseño, los componentes visuales y las acciones asociadas a los botones y campos de entrada.

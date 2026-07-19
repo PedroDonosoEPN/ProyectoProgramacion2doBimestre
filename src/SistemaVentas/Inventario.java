@@ -13,7 +13,7 @@ public class Inventario {
     /**
     * Ruta del archivo de texto que almacena los productos del inventario.
     */
-    private static final String RUTA_ARCHIVO = "data/datos_inventario.txt";
+    private static final String RUTA_ARCHIVO = "data\\datos_inventario.txt";
     /**
     * Separador utilizado para dividir los campos de cada producto en el archivo de texto.
     */

@@ -1,3 +1,4 @@
+
 package GUI.Form;
 
 import GUI.Style;
@@ -10,39 +11,43 @@ import java.util.Locale;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TableModelEvent;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.PlainDocument;
-    /**
-    * Representa la vista del módulo de inventario para la interfaz gráfica de usuario (GUI) de la aplicación. Extiende la clase JPanel y proporciona métodos para crear y personalizar los componentes visuales del módulo, incluyendo botones, tablas y paneles.
-    * Esta clase se encarga de mostrar la información del inventario, permitir la adición y eliminación de productos, y gestionar la interacción del usuario con el módulo de inventario.
-    * Se integra con la clase Inventario para manejar la lógica de negocio y el almacenamiento de los productos en el inventario, proporcionando una experiencia de usuario completa y funcional.
-    */
+
+/**
+ * Representa la vista del módulo de inventario para la interfaz gráfica de usuario (GUI) de la aplicación. Extiende la clase JPanel y proporciona métodos para crear y personalizar los componentes visuales del módulo, incluyendo botones, tablas y paneles.
+ * Esta clase se encarga de mostrar la información del inventario, permitir la adición y eliminación de productos, y gestionar la interacción del usuario con el módulo de inventario.
+ * Se integra con la clase Inventario para manejar la lógica de negocio y el almacenamiento de los productos en el inventario, proporcionando una experiencia de usuario completa y funcional.
+ */
 public class VistaInventario extends JPanel {
 
-    public JButton btnVolver = new JButton("✕ Cancelar");
-    public JButton btnAgregar = new JButton("+ Agregar");
-    public JButton btnEditar = new JButton("/ Editar");
-    public JButton btnEliminar = new JButton("- Eliminar");
+    public JButton btnVolver = new JButton("◀ Volver al Menú");
+    public JButton btnAgregar = new JButton("✦ Agregar");
+    public JButton btnEditar = new JButton("✎ Editar");
+    public JButton btnEliminar = new JButton("🗑 Eliminar");
     private JTable tabla;
 
     // Instanciamos la clase que se encargará de la lógica de negocio y archivos
     private Inventario gestionInventario = new Inventario();
+
     /**
-    * Constructor de la clase VistaInventario. Inicializa el panel de inventario y llama a los métodos para crear el menú lateral, el área de trabajo y configurar las acciones de los botones.
-    * Se establece un diseño de tipo BorderLayout para organizar los componentes dentro del panel de inventario, permitiendo una disposición adecuada de los elementos visuales y facilitando la interacción del usuario con el módulo de inventario.
-    */
+     * Constructor de la clase VistaInventario. Inicializa el panel de inventario y llama a los métodos para crear el menú lateral, el área de trabajo y configurar las acciones de los botones.
+     * Se establece un diseño de tipo BorderLayout para organizar los componentes dentro del panel de inventario, permitiendo una disposición adecuada de los elementos visuales y facilitando la interacción del usuario con el módulo de inventario.
+     */
     public VistaInventario() {
         setLayout(new BorderLayout());
         add(crearMenuLateral(), BorderLayout.WEST);
         add(crearAreaTrabajo(), BorderLayout.CENTER);
         configurarAcciones();
     }
+
     /**
-    * Configura las acciones de los botones en la vista del inventario.
-    */
+     * Configura las acciones de los botones en la vista del inventario.
+     */
     private void configurarAcciones() {
         btnVolver.addActionListener(e -> {
             JFrame ventanaPrincipal = (JFrame) SwingUtilities.getWindowAncestor(this);
@@ -62,7 +67,6 @@ public class VistaInventario extends JPanel {
 
             String[] datos = dialogo.getDatosValidados();
             if (datos != null) {
-                // 1. Creamos el objeto Producto
                 Producto nuevoProducto = new Producto(
                         datos[0], 
                         datos[1], 
@@ -71,14 +75,11 @@ public class VistaInventario extends JPanel {
                         datos[4]
                 );
 
-                // 2. Le decimos al cerebro que lo guarde en el archivo
                 gestionInventario.agregarProducto(nuevoProducto);
 
-                // 3. Actualizamos la tabla visualmente
                 DefaultTableModel modelo = (DefaultTableModel) tabla.getModel();
                 cargarDatos(modelo);
 
-                // Feedback visual: seleccionar y hacer scroll hasta la fila recién creada
                 int nuevaFila = modelo.getRowCount() - 1;
                 tabla.setRowSelectionInterval(nuevaFila, nuevaFila);
                 tabla.scrollRectToVisible(tabla.getCellRect(nuevaFila, 0, true));
@@ -139,10 +140,8 @@ public class VistaInventario extends JPanel {
 
             if (confirmacion == JOptionPane.YES_OPTION) {
                 modelo.removeRow(filaSeleccionada);
-                // Le pasamos toda la tabla actualizada al cerebro para que reescriba el archivo
                 guardarTablaEnInventario(modelo);
                 
-                // Desactivamos los botones porque la selección se ha eliminado
                 btnEliminar.setEnabled(false);
                 btnEditar.setEnabled(false);
             }
@@ -151,9 +150,10 @@ public class VistaInventario extends JPanel {
         btnEliminar.setEnabled(false);
         btnEditar.setEnabled(false);
     }
+
     /**
-    * Crea el panel lateral del módulo de inventario, que contiene un título y un botón para volver al menú principal. Se establece un diseño vertical utilizando BoxLayout y se aplican estilos visuales a los componentes, como colores, fuentes y márgenes.
-    */
+     * Crea el panel lateral del módulo de inventario, que contiene un título y un botón para volver al menú principal. 
+     */
     private JPanel crearMenuLateral() {
         JPanel panelMenu = new JPanel() {
             @Override
@@ -170,12 +170,13 @@ public class VistaInventario extends JPanel {
             }
         };
         panelMenu.setOpaque(false);
-        panelMenu.setPreferredSize(new Dimension(220, 0));
+        // MEJORA UI: Panel lateral más ancho para mayor elegancia
+        panelMenu.setPreferredSize(new Dimension(260, 0));
         panelMenu.setLayout(new BoxLayout(panelMenu, BoxLayout.Y_AXIS));
-        panelMenu.setBorder(new EmptyBorder(30, 20, 30, 20));
+        panelMenu.setBorder(new EmptyBorder(40, 25, 40, 25));
 
         JLabel lblModulo = new JLabel("Inventario");
-        lblModulo.setFont(Style.FONT_TITULO);
+        lblModulo.setFont(new Font("Segoe UI", Font.BOLD, 32));
         lblModulo.setForeground(Color.WHITE);
         lblModulo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -187,14 +188,15 @@ public class VistaInventario extends JPanel {
         panelMenu.add(btnVolver);
         return panelMenu;
     }
+
     /**
-    * Crea el área de trabajo del módulo de inventario, que contiene los botones de acción y la tabla de productos. Se establece un diseño de tipo BorderLayout para organizar los componentes dentro del panel central, permitiendo una disposición adecuada de los elementos visuales y facilitando la interacción del usuario con el módulo de inventario.
-    * @return El panel central con los componentes del área de trabajo.
-    */
+     * Crea el área de trabajo del módulo de inventario, que contiene los botones de acción y la tabla de productos.
+     * @return El panel central con los componentes del área de trabajo.
+     */
     private JPanel crearAreaTrabajo() {
-        JPanel panelCentral = new JPanel(new BorderLayout(15, 15));
+        JPanel panelCentral = new JPanel(new BorderLayout(20, 20));
         panelCentral.setBackground(Style.COLOR_FONDO_PRINCIPAL);
-        panelCentral.setBorder(new EmptyBorder(25, 25, 25, 25));
+        panelCentral.setBorder(new EmptyBorder(30, 30, 30, 30));
 
         JPanel panelAcciones = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         panelAcciones.setBackground(Style.COLOR_FONDO_PRINCIPAL);
@@ -223,14 +225,43 @@ public class VistaInventario extends JPanel {
 
         tabla = new JTable(modeloTabla);
         tabla.setFont(Style.FONT);
-        tabla.setRowHeight(35);
-        tabla.setSelectionBackground(new Color(255, 235, 235));
+        // MEJORA UI: Filas más altas para aspecto limpio
+        tabla.setRowHeight(40);
+        tabla.setSelectionBackground(new Color(230, 240, 250));
         tabla.setSelectionForeground(Color.BLACK);
-        tabla.getTableHeader().setPreferredSize(new Dimension(0, 35));
+        tabla.getTableHeader().setPreferredSize(new Dimension(0, 45));
         tabla.getTableHeader().setFont(Style.FONT_BOLD);
         tabla.getTableHeader().setBackground(Style.COLOR_BOTON_SECUNDARIO);
         tabla.setShowVerticalLines(false);
         tabla.setGridColor(Style.COLOR_BORDER);
+
+        // MEJORA UI: Reajuste perfecto de anchos de columna
+        tabla.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        tabla.getColumnModel().getColumn(0).setPreferredWidth(180); // Nombre
+        tabla.getColumnModel().getColumn(1).setPreferredWidth(100); // Código
+        tabla.getColumnModel().getColumn(2).setPreferredWidth(140); // Cantidad en Stock (Ya no se corta)
+        tabla.getColumnModel().getColumn(3).setPreferredWidth(100); // Precio
+        tabla.getColumnModel().getColumn(4).setPreferredWidth(300); // Descripción
+
+        // MEJORA UI: Centrar datos numéricos y códigos para mejor lectura
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        tabla.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
+        tabla.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
+        tabla.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
+
+        // Tooltip para la descripción
+        DefaultTableCellRenderer rendererConTooltip = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (c instanceof JComponent && value != null) {
+                    ((JComponent) c).setToolTipText(value.toString());
+                }
+                return c;
+            }
+        };
+        tabla.getColumnModel().getColumn(4).setCellRenderer(rendererConTooltip);
 
         tabla.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
@@ -241,7 +272,8 @@ public class VistaInventario extends JPanel {
         });
 
         JScrollPane scrollPane = new JScrollPane(tabla);
-        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(220, 220, 220), 1, true));
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(210, 215, 222), 1, true));
+        scrollPane.getViewport().setBackground(Color.WHITE);
 
         panelCentral.add(panelAcciones, BorderLayout.NORTH);
         panelCentral.add(scrollPane, BorderLayout.CENTER);
@@ -249,9 +281,9 @@ public class VistaInventario extends JPanel {
     }
 
     /**
-    * Carga los datos del inventario en el modelo de la tabla. Obtiene la lista de productos desde la clase Inventario y agrega cada producto como una fila en el modelo de la tabla, mostrando su nombre, código, cantidad, precio y descripción.
-    * @param modeloTabla El modelo de la tabla donde se cargarán los datos del inventario.
-    */
+     * Carga los datos del inventario en el modelo de la tabla. 
+     * @param modeloTabla El modelo de la tabla donde se cargarán los datos del inventario.
+     */
     private void cargarDatos(DefaultTableModel modeloTabla) {
         modeloTabla.setRowCount(0); 
         
@@ -267,10 +299,11 @@ public class VistaInventario extends JPanel {
             });
         }
     }
+
     /**
-    * Guarda los datos de la tabla en el inventario. Recorre cada fila del modelo de la tabla, crea un objeto Producto con los datos de cada fila y agrega el producto a una lista actualizada. Luego, llama al método guardarTodo de la clase Inventario para guardar la lista actualizada en el archivo correspondiente.
-    * @param modeloTabla El modelo de la tabla que contiene los datos del inventario a
-    */
+     * Guarda los datos de la tabla en el inventario. 
+     * @param modeloTabla El modelo de la tabla que contiene los datos del inventario a guardar
+     */
     private void guardarTablaEnInventario(DefaultTableModel modeloTabla) {
         List<Producto> listaActualizada = new ArrayList<>();
         
@@ -288,12 +321,12 @@ public class VistaInventario extends JPanel {
     }
 
     /**
-    * Configura un botón con estilo plano, estableciendo su fuente, tamaño máximo, alineación, cursor, enfoque, borde y color de fondo. Este método se utiliza para personalizar la apariencia de los botones en la interfaz gráfica de usuario (GUI) del módulo de inventario.
-    * @param btn El botón que se desea configurar con estilo plano.
-    */
+     * Configura un botón con estilo plano.
+     * @param btn El botón que se desea configurar.
+     */
     private void configurarBotonPlano(JButton btn) {
         btn.setFont(Style.FONT_BOLD);
-        btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
         btn.setAlignmentX(Component.CENTER_ALIGNMENT);
         btn.setCursor(Style.CURSOR_HAND);
         btn.setFocusPainted(false);
@@ -305,10 +338,10 @@ public class VistaInventario extends JPanel {
     }
 
     /**
-    * Configura un botón con estilo de acción, estableciendo su fuente, cursor, enfoque, borde y color de fondo. Este método se utiliza para personalizar la apariencia de los botones de acción en la interfaz gráfica de usuario (GUI) del módulo de inventario.
-    * @param btn El botón que se desea configurar con estilo de acción.
-    * @param colorFondo El color de fondo que se desea aplicar al botón.
-    */
+     * Configura un botón con estilo de acción.
+     * @param btn El botón que se desea configurar con estilo de acción.
+     * @param colorFondo El color de fondo que se desea aplicar al botón.
+     */
     private void configurarBotonAccion(JButton btn, Color colorFondo) {
         btn.setFont(Style.FONT_BOLD);
         btn.setCursor(Style.CURSOR_HAND);
@@ -316,7 +349,7 @@ public class VistaInventario extends JPanel {
         btn.setBorderPainted(false);
         btn.setBackground(colorFondo);
         btn.setForeground(Color.WHITE);
-        btn.setPreferredSize(new Dimension(160, 40));   
+        btn.setPreferredSize(new Dimension(150, 42));   
 
         btn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -329,10 +362,8 @@ public class VistaInventario extends JPanel {
     }
 
     /**
-    * Clase interna que representa un cuadro de diálogo para agregar un nuevo producto al inventario. Extiende la clase JDialog y proporciona campos de entrada para el nombre, código, cantidad, precio y descripción del producto, así como botones para guardar o cancelar la acción.
-    * Esta clase se utiliza para recopilar la información del nuevo producto de manera estructurada y validada, asegurando que los datos ingresados cumplan con los requisitos establecidos antes de agregarlos al inventario.
-    * Implementa filtros de entrada para los campos de cantidad y precio, permitiendo solo números enteros y decimales válidos, respectivamente. Además, proporciona retroalimentación visual en caso de errores de validación, mostrando mensajes claros al usuario.
-    */
+     * Clase interna que representa un cuadro de diálogo para agregar/editar un producto.
+     */
     private static class DialogoProducto extends JDialog {
 
         private final JTextField txtNombre = new JTextField(20);
@@ -344,24 +375,19 @@ public class VistaInventario extends JPanel {
 
         private String[] datosValidados = null;
         private final boolean modoEdicion;
-    /**
-    * Constructor de la clase DialogoProducto. Inicializa el cuadro de diálogo para agregar un nuevo producto, estableciendo su diseño, tamaño, comportamiento y agregando los componentes visuales necesarios para la entrada de datos del producto.
-    * Se aplican filtros de entrada para los campos de cantidad y precio, permitiendo solo números enteros y decimales válidos, respectivamente. Además, se configuran los botones de guardar y cancelar, así como la acción predeterminada al presionar la tecla Enter y la acción de cierre al presionar la tecla Escape.
-    * @param padre La ventana principal de la aplicación que actúa como padre del cuadro de diálogo, permitiendo que el cuadro de diálogo se muestre de manera modal y centrada sobre la ventana principal.
-    */
+
         DialogoProducto(JFrame padre) {
             this(padre, null);
         }
 
-        // datosIniciales: {nombre, codigo, cantidad, precio, descripcion} o null para modo "agregar"
         DialogoProducto(JFrame padre, String[] datosIniciales) {
             super(padre, datosIniciales == null ? "Agregar producto" : "Editar producto", true);
             this.modoEdicion = datosIniciales != null;
             setLayout(new BorderLayout(10, 10));
             setResizable(false);
 
-            JPanel form = new JPanel(new GridLayout(5, 2, 10, 12));
-            form.setBorder(new EmptyBorder(20, 20, 10, 20));
+            JPanel form = new JPanel(new GridLayout(5, 2, 10, 15));
+            form.setBorder(new EmptyBorder(25, 25, 10, 25));
 
             aplicarFiltroEntero(txtCantidad);
             aplicarFiltroDecimal(txtPrecio);
@@ -380,17 +406,18 @@ public class VistaInventario extends JPanel {
             form.add(txtCodigo);
             form.add(new JLabel("Cantidad en stock:"));
             form.add(txtCantidad);
-            form.add(new JLabel("Precio (usa punto, ej: 2.50):"));
+            form.add(new JLabel("Precio (ej: 2.50):"));
             form.add(txtPrecio);
             form.add(new JLabel("Descripción:"));
             form.add(txtDescripcion);
 
             lblError.setForeground(new Color(192, 57, 43));
-            lblError.setBorder(new EmptyBorder(0, 20, 0, 20));
+            lblError.setBorder(new EmptyBorder(0, 25, 0, 25));
 
             JButton btnGuardar = new JButton(modoEdicion ? "Guardar cambios" : "Guardar");
             JButton btnCancelar = new JButton("Cancelar");
-            JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+            JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 15));
+            panelBotones.setBorder(new EmptyBorder(0, 0, 10, 15));
             panelBotones.add(btnCancelar);
             panelBotones.add(btnGuardar);
 
@@ -411,9 +438,7 @@ public class VistaInventario extends JPanel {
             pack();
             setLocationRelativeTo(padre);
         }
-    /**
-    * Valida los datos ingresados por el usuario y los guarda si son válidos.
-    */
+
         private void validarYGuardar() {
             String nombre = txtNombre.getText().trim();
             String codigo = txtCodigo.getText().trim();
@@ -444,7 +469,7 @@ public class VistaInventario extends JPanel {
                 precio = Double.parseDouble(precioTexto);
                 if (precio < 0) throw new NumberFormatException();
             } catch (NumberFormatException ex) {
-                mostrarError("El precio debe ser un número válido igual o mayor a 0.");
+                mostrarError("El precio debe ser válido igual o mayor a 0.");
                 return;
             }
 
@@ -454,24 +479,15 @@ public class VistaInventario extends JPanel {
             };
             dispose();
         }
-    /**
-    * Muestra un mensaje de error en la etiqueta correspondiente.
-    * @param mensaje El mensaje de error a mostrar.
-    */
+
         private void mostrarError(String mensaje) {
             lblError.setText(mensaje);
         }
-    /**
-    * Obtiene los datos validados.
-    * @return Un arreglo de cadenas con los datos validados.
-    */
+
         String[] getDatosValidados() {
             return datosValidados;
         }
-    /**
-    * Aplica un filtro de entrada para permitir solo números enteros en el campo especificado.
-    * @param campo El campo de texto al que se le aplicará el filtro.
-    */
+
         private void aplicarFiltroEntero(JTextField campo) {
             ((PlainDocument) campo.getDocument()).setDocumentFilter(new DocumentFilter() {
                 @Override
@@ -484,10 +500,7 @@ public class VistaInventario extends JPanel {
                 }
             });
         }
-    /**
-    * Aplica un filtro de entrada para permitir solo números decimales en el campo especificado.
-    * @param campo El campo de texto al que se le aplicará el filtro.
-    */
+
         private void aplicarFiltroDecimal(JTextField campo) {
             ((PlainDocument) campo.getDocument()).setDocumentFilter(new DocumentFilter() {
                 private boolean esValido(FilterBypass fb, int offset, int length, String textoNuevo) throws BadLocationException {
