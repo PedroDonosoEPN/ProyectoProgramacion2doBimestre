@@ -137,13 +137,13 @@ public class MenuPanel extends JPanel {
         return tarjeta;
     }
 
-    private JPanel crearTarjeta(String icono, String titulo, String descripcion, Color colorHover, Runnable accion) {
+   /*  private JPanel crearTarjeta(String icono, String titulo, String descripcion, Color colorHover, Runnable accion) {
         JLabel lblIcono = new JLabel(icono);
         lblIcono.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 55));
         lblIcono.setAlignmentX(Component.CENTER_ALIGNMENT);
         return crearTarjeta(lblIcono, titulo, descripcion, colorHover, accion);
     }
-
+*/
     private JPanel crearTarjeta(Icon icono, String titulo, String descripcion, Color colorHover, Runnable accion) {
         JLabel lblIcono = new JLabel(icono);
         lblIcono.setAlignmentX(Component.CENTER_ALIGNMENT);
