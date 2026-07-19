@@ -1,5 +1,3 @@
-Ibuprofeno,MED-002,4,2.5,Antiinflamatorio 400mg
+Ibuprofeno,MED-002,3,2.5,Antiinflamatorio 400mg
 Alcohol,INS-001,44,1.0,Botella 250ml 70 grados
 Vendas,INS-002,198,0.5,Venda elástica 5cm
-12,13,4,5.0,
-Pan,34,44,2.0,po
