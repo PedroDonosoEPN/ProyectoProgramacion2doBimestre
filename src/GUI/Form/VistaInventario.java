@@ -40,12 +40,10 @@ public class VistaInventario extends JPanel {
             Container cont = ventanaPrincipal.getContentPane();
             cont.removeAll();
             cont.setLayout(new BorderLayout());
-            cont.add(new MenuPanel(), BorderLayout.CENTER);  // ✅ Corregido
+            cont.add(new MenuPanel(), BorderLayout.CENTER);
             ventanaPrincipal.revalidate();
             ventanaPrincipal.repaint();
-                });
-
-        // ---- AGREGAR ----
+        });
         btnAgregar.addActionListener(e -> {
             JFrame ventanaPrincipal = (JFrame) SwingUtilities.getWindowAncestor(this);
             DialogoProducto dialogo = new DialogoProducto(ventanaPrincipal);

@@ -2,44 +2,41 @@ package GUI.Form;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Image;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import GUI.Style;
 
 public class MainForm extends JFrame {
-    MenuPanel  pnlMenu = new MenuPanel();
-    JPanel     pnlMain = new MainPanel();
+    MenuPanel pnlMenu = new MenuPanel();
 
     public MainForm(String tilteApp) {
         customizeComponent(tilteApp);
-        //pnlMenu.btnHome.addActionListener(      e -> setPanel(new MainPanel())); 
-        //agregar
-        pnlMenu.btnTest.addActionListener( e -> { Style.showMsgError("mensaje de error");}); 
-    }
-
-    private void setPanel(JPanel formularioPanel) {
-        Container container = getContentPane();
-        container.remove(pnlMain);
-        pnlMain = formularioPanel;
-        container.add(pnlMain, BorderLayout.CENTER);
-        revalidate();
-        repaint();
     }
      
     private void customizeComponent(String tilteApp) {
         setTitle(tilteApp);
-        setSize(100+900, 840);
+        setSize(1000, 600);
         setResizable(false);
         setLocationRelativeTo(null); // Centrar en la pantalla
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setAppIcon();
 
-        // Agregar los paneles al contenedor usando BorderLayout
+        // Agregar el menú principal al contenedor
         Container container = getContentPane();
         container.setLayout(new BorderLayout());
-        container.add(pnlMenu, BorderLayout.WEST);
-        container.add(pnlMain, BorderLayout.CENTER);
+        container.add(pnlMenu, BorderLayout.CENTER);
         setVisible(true);
-    }   
+    }
+
+    private void setAppIcon() {
+        if (Style.getAppIconUrl() != null) {
+            ImageIcon icon = new ImageIcon(Style.getAppIconUrl());
+            Image image = icon.getImage();
+            setIconImage(image);
+        }
+    }
 }
