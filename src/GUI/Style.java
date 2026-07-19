@@ -10,38 +10,41 @@ import javax.swing.SwingConstants;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-
+    /**
+    * Representa la clase de estilo para la interfaz gráfica de usuario (GUI) de la aplicación. Contiene constantes y métodos estáticos que definen los colores, fuentes, bordes y otros elementos visuales utilizados en la GUI.
+    */
 public abstract class Style {
+    // URLS
     public static final URL URL_MAIN      = Style.class.getResource("/GUI/Resource/Img/Main.png");
     public static final URL URL_MENU      = Style.class.getResource("/GUI/Resource/Img/Main.png");
     public static final URL URL_LOGO      = Style.class.getResource("/GUI/Resource/Img/Icon.png");
     public static final URL URL_SPLASH    = Style.class.getResource("/GUI/Resource/Img/Icon.png");
     public static final URL URL_APP_ICON  = Style.class.getResource("/GUI/Resource/Img/Icon.png");
-
-    public static final Color COLOR_PANEL_LATERAL = new Color(160, 25, 25); 
-public static final Color COLOR_BOTON_NORMAL = new Color(200, 40, 40); 
-public static final Color COLOR_FONDO_PRINCIPAL = new Color(245, 245, 245); // Gris muy suave`
-    public static final Color COLOR_BOTON_HOVER = new Color(220, 50, 50); 
-    public static final Color COLOR_BOTON_SECUNDARIO = new Color(224, 224, 224); 
-
+    // COLORS
+    public static final Color COLOR_PANEL_LATERAL       = new Color(160, 25, 25); 
+    public static final Color COLOR_BOTON_NORMAL        = new Color(200, 40, 40); 
+    public static final Color COLOR_FONDO_PRINCIPAL     = new Color(245, 245, 245); // Gris muy suave`
+    public static final Color COLOR_BOTON_HOVER         = new Color(220, 50, 50); 
+    public static final Color COLOR_BOTON_SECUNDARIO    = new Color(224, 224, 224); 
+    // COLOR FONTS
     public static final Color COLOR_FONT = new Color(51, 51, 51); 
     public static final Color COLOR_FONT_LIGHT = new Color(130, 130, 130);
     public static final Color COLOR_FONT_BG_OSCURO = new Color(255, 255, 255); 
     public static final Color COLOR_CURSOR = new Color(51, 51, 51);
     public static final Color COLOR_BORDER = new Color(210, 210, 210); 
-
+    // FONTS
     public static final Font FONT        = new Font("JetBrains Mono", Font.PLAIN, 14);
     public static final Font FONT_BOLD   = new Font("JetBrains Mono", Font.BOLD, 14);
     public static final Font FONT_SMALL  = new Font("JetBrains Mono", Font.PLAIN, 11);
     public static final Font FONT_TITULO = new Font("JetBrains Mono", Font.BOLD, 22);
-
+    // ALIGNMENTS
     public static final int ALIGNMENT_LEFT   = SwingConstants.LEFT;
     public static final int ALIGNMENT_RIGHT  = SwingConstants.RIGHT;
     public static final int ALIGNMENT_CENTER = SwingConstants.CENTER;
-
+    // CURSORS
     public static final Cursor CURSOR_HAND    = new Cursor(Cursor.HAND_CURSOR);
     public static final Cursor CURSOR_DEFAULT = new Cursor(Cursor.DEFAULT_CURSOR);
-
+    // BORDERS
     public static final CompoundBorder createBorderRect(){
         return BorderFactory.createCompoundBorder(
                 new LineBorder(COLOR_BORDER, 1),
@@ -52,11 +55,11 @@ public static final Color COLOR_FONDO_PRINCIPAL = new Color(245, 245, 245); // G
     public static final EmptyBorder createEmptyPadding(){
         return new EmptyBorder(20, 20, 20, 20);
     }
-
+    // GETTERS
     public static final URL getAppIconUrl() {
         return URL_APP_ICON;
     }
-
+    // MESSAGES
     public static final void showMsg(String msg){
         JOptionPane.showMessageDialog(null, msg, "😏 SystemVentas", JOptionPane.INFORMATION_MESSAGE);
     }

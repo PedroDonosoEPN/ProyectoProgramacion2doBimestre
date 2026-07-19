@@ -6,9 +6,16 @@ import java.awt.event.MouseEvent;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-
+    /**
+    * Representa un panel de menú personalizado para la interfaz gráfica de usuario (GUI) de la aplicación. Extiende la clase JPanel y proporciona métodos para personalizar el aspecto y comportamiento del panel, incluyendo tarjetas interactivas que permiten a los usuarios acceder a diferentes módulos de la aplicación.
+    * Esta clase se utiliza como contenedor principal para los elementos del menú de la GUI,
+    */
 public class MenuPanel extends JPanel {
-
+    /**
+    * Constructor de la clase MenuPanel. Inicializa el panel de menú y llama al método customizeComponent() para personalizar su apariencia y comportamiento.
+    * Se establecen tarjetas interactivas que permiten a los usuarios acceder a diferentes módulos de la aplicación, como el módulo de ventas y el control de inventario.
+    * Se configuran eventos de mouse para cambiar el aspecto de las tarjetas al pasar el mouse sobre ellas y para manejar las acciones correspondientes al hacer clic en cada tarjeta.
+    */
     public MenuPanel() {
         // Permitimos que se dibuje el degradado personalizado
         setOpaque(false); 
@@ -136,20 +143,36 @@ public class MenuPanel extends JPanel {
 
         return tarjeta;
     }
-
-   /*  private JPanel crearTarjeta(String icono, String titulo, String descripcion, Color colorHover, Runnable accion) {
+    /**
+    * Método privado que crea una tarjeta personalizada con un icono, título, descripción, color de hover y acción asociada. Se utiliza para generar tarjetas interactivas en el panel de menú, permitiendo a los usuarios acceder a diferentes módulos de la aplicación al hacer clic en ellas.
+    * @param icono El icono que se mostrará en la tarjeta.
+    * @param titulo El título de la tarjeta.
+    * @param descripcion La descripción de la tarjeta.
+    * @param colorHover El color que se utilizará cuando el mouse esté sobre la tarjeta.
+    * @param accion La acción que se ejecutará al hacer clic en la tarjeta.
+    */
+    private JPanel crearTarjeta(String icono, String titulo, String descripcion, Color colorHover, Runnable accion) {
         JLabel lblIcono = new JLabel(icono);
         lblIcono.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 55));
         lblIcono.setAlignmentX(Component.CENTER_ALIGNMENT);
         return crearTarjeta(lblIcono, titulo, descripcion, colorHover, accion);
     }
-*/
+    /**
+    * Método privado que crea una tarjeta personalizada con un icono, título, descripción, color de hover y acción asociada. Se utiliza para generar tarjetas interactivas en el panel de menú, permitiendo a los usuarios acceder a diferentes módulos de la aplicación al hacer clic en ellas.
+    * @param icono El icono que se mostrará en la tarjeta.
+    * @param titulo El título de la tarjeta.
+    * @param descripcion La descripción de la tarjeta.
+    * @param colorHover El color que se utilizará cuando el mouse esté sobre la tarjeta.
+    * @param accion La acción que se ejecutará al hacer clic en la tarjeta.
+    */
     private JPanel crearTarjeta(Icon icono, String titulo, String descripcion, Color colorHover, Runnable accion) {
         JLabel lblIcono = new JLabel(icono);
         lblIcono.setAlignmentX(Component.CENTER_ALIGNMENT);
         return crearTarjeta(lblIcono, titulo, descripcion, colorHover, accion);
     }
-
+    /**
+    * Método privado que abre el módulo de ventas al hacer clic en la tarjeta correspondiente. Obtiene la ventana principal de la aplicación, limpia su contenido y agrega el panel del módulo de ventas al contenedor principal, actualizando la interfaz gráfica de usuario (GUI) para reflejar el cambio.
+    */
     private void abrirModuloVentas() {
         JFrame ventanaPrincipal = (JFrame) SwingUtilities.getWindowAncestor(this);
         Container cont = ventanaPrincipal.getContentPane();
@@ -159,7 +182,9 @@ public class MenuPanel extends JPanel {
         ventanaPrincipal.revalidate();
         ventanaPrincipal.repaint();
     }
-
+    /**
+    * Metodo privado que abre el módulo de inventario al hacer clic en la tarjeta correspondiente. Solicita al usuario que ingrese la contraseña de administrador mediante un cuadro de diálogo. Si la contraseña ingresada es correcta, obtiene la ventana principal de la aplicación, limpia su contenido y agrega el panel del módulo de inventario al contenedor principal, actualizando la interfaz gráfica de usuario (GUI) para reflejar el cambio. Si la contraseña es incorrecta, muestra un mensaje de error indicando que el acceso ha sido denegado.
+    */
     private void abrirModuloInventario() {
         JPasswordField txtPassword = new JPasswordField();
         int ordenarConfirmacion = JOptionPane.showConfirmDialog(

@@ -15,7 +15,9 @@ import java.util.Locale;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-
+    /**
+    * Clase que representa la vista para la gestión de ventas. Extiende JPanel y proporciona una interfaz gráfica para realizar ventas, incluyendo la selección de productos, escaneo de códigos de barras, visualización del carrito de compras y procesamiento de pagos.
+    */
 public class VistaVentas extends JPanel {
 
     public JButton btnVolver = new JButton("✕ Cancelar Venta");
@@ -31,20 +33,26 @@ public class VistaVentas extends JPanel {
 
     private static final String RUTA_VENTAS = "data/registro_ventas.txt";
     private static final int COL_ACCION = 3;
-
+    /**
+    * Constructor de la clase VistaVentas. Inicializa la interfaz gráfica de usuario (GUI) para la gestión de ventas, configurando el diseño, los componentes visuales y las acciones asociadas a los botones y campos de entrada.
+    */
     public VistaVentas() {
         setLayout(new BorderLayout());
         add(crearMenuLateral(), BorderLayout.WEST);
         add(crearAreaTrabajo(), BorderLayout.CENTER);
         configurarAcciones();
     }
-
+    /**
+    * Configura las acciones de los componentes de la interfaz gráfica. Se establecen los comportamientos de los botones y campos de entrada, incluyendo la acción de escanear productos, agregar productos al carrito, cancelar la venta y procesar el pago. Además, se manejan las validaciones necesarias para asegurar que las acciones se realicen correctamente y se actualice la vista del carrito de compras.
+    */
     @Override
     public void addNotify() {
         super.addNotify();
         SwingUtilities.invokeLater(() -> txtEscaner.requestFocusInWindow());
     }
-
+    /**
+    * Configura las acciones de los componentes de la interfaz gráfica. Se establecen los comportamientos de los botones y campos de entrada, incluyendo la acción de escanear productos, agregar productos al carrito, cancelar la venta y procesar el pago. Además, se manejan las validaciones necesarias para asegurar que las acciones se realicen correctamente y se actualice la vista del carrito de compras.
+    */
     private void configurarAcciones() {
         // Botón cancelar venta: pide confirmación si ya hay productos en el carrito
         btnVolver.addActionListener(e -> {
@@ -129,7 +137,9 @@ public class VistaVentas extends JPanel {
             }
         });
     }
-
+    /**
+    * Proceso de actualización de la vista del carrito de compras. Limpia la tabla del carrito y la rellena con los productos actualmente agregados a la venta, mostrando el nombre del producto, la cantidad, el subtotal de cada línea y un botón para quitar el producto del carrito. Además, actualiza la etiqueta que muestra el subtotal total de la venta.
+    */
     private void actualizarVistaCarrito() {
         DefaultTableModel modelo = (DefaultTableModel) tablaCarrito.getModel();
         modelo.setRowCount(0);
@@ -147,7 +157,9 @@ public class VistaVentas extends JPanel {
     }
 
     // ---------- Menús y Paneles Visuales ----------
-
+    /**
+    * Método privado que crea el panel lateral del menú de ventas. Este panel contiene botones para cancelar la venta y terminar la venta, así como un título que indica que se está en el módulo de ventas. El panel tiene un diseño vertical y un fondo degradado para mejorar la apariencia visual.
+    */
     private JPanel crearMenuLateral() {
         JPanel panelMenu = new JPanel() {
             @Override
@@ -186,7 +198,9 @@ public class VistaVentas extends JPanel {
         panelMenu.add(btnTerminar);
         return panelMenu;
     }
-
+    /**
+    * Método privado que crea el área de trabajo principal para la gestión de ventas. Este panel contiene la zona de escaneo de productos, los botones para agregar productos y mostrar el subtotal, así como la tabla que muestra los productos agregados al carrito de compras. El panel tiene un diseño organizado y visualmente atractivo, con bordes y espaciado adecuados para mejorar la experiencia del usuario.
+    */
     private JPanel crearAreaTrabajo() {
         JPanel panelCentral = new JPanel(new BorderLayout(15, 15));
         panelCentral.setBackground(Style.COLOR_FONDO_PRINCIPAL);
@@ -290,7 +304,7 @@ public class VistaVentas extends JPanel {
         panelCentral.add(scrollPane, BorderLayout.CENTER);
         return panelCentral;
     }
-
+    //Configuracion Botones
     private void configurarBotonPlano(JButton btn) {
         btn.setFont(Style.FONT_BOLD);
         btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
@@ -319,7 +333,9 @@ public class VistaVentas extends JPanel {
     }
 
     // ---------- Lógica de Escaneo y Stock ----------
-
+    /**
+    * Procesa la acción de escanear un producto por su código. Verifica si el producto existe en el inventario y si hay stock disponible. Si el producto es válido, se agrega al carrito de compras y se actualiza la vista del carrito. Si no se encuentra el producto o no hay stock suficiente, se muestra un mensaje de error.
+    */
     private void escanearProducto() {
         String codigo = txtEscaner.getText().trim();
         txtEscaner.setText("");
@@ -357,7 +373,9 @@ public class VistaVentas extends JPanel {
         }
         return mapa;
     }
-
+    /**
+    * Desconta el stock del inventario para los productos vendidos.
+    */
     private void descontarStockInventario() {
         List<Producto> inventarioCompleto = gestionInventario.obtenerProductos();
 
@@ -371,7 +389,9 @@ public class VistaVentas extends JPanel {
         }
         gestionInventario.guardarTodo(inventarioCompleto);
     }
-
+    /**
+    * Registra la venta en un archivo de texto para mantener un historial de ventas. Se guarda la fecha y hora de la venta, el total de la venta y los detalles de los productos vendidos, incluyendo el nombre y la cantidad de cada producto. Si ocurre algún error al guardar el registro, se muestra un mensaje de error.
+    */
     private void registrarVentaArchivo() {
         try {
             java.io.File archivo = new java.io.File(RUTA_VENTAS);
@@ -449,7 +469,10 @@ public class VistaVentas extends JPanel {
             pack();
             setLocationRelativeTo(padre);
         }
-
+    /**
+    * Actualiza el valor máximo disponible en el spinner de cantidad según el producto seleccionado y la cantidad ya agregada al carrito. Si no hay stock disponible, desactiva el spinner y muestra un mensaje de error. Si hay stock disponible, habilita el spinner y ajusta su modelo para reflejar la cantidad máxima que se puede agregar.
+    * Este método se llama cada vez que se selecciona un producto diferente en el combo box, asegurando que el usuario solo pueda seleccionar una cantidad válida basada en el stock disponible y la cantidad ya agregada al carrito.
+    */
         private void actualizarMaximoDisponible() {
             int index = comboProductos.getSelectedIndex();
             if (index < 0) return;
@@ -468,7 +491,9 @@ public class VistaVentas extends JPanel {
                 spinnerCantidad.setModel(new SpinnerNumberModel(1, 1, disponible, 1));
             }
         }
-
+    /**
+    * Valida los datos ingresados por el usuario y confirma la adición del producto al carrito.
+    */
         private void validarYConfirmar() {
             int index = comboProductos.getSelectedIndex();
             if (index < 0) return;
