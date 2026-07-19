@@ -1,17 +1,26 @@
 package SistemaVentas;
-
+    /**
+    * Crea un objeto Factura que representa una factura en el sistema de ventas e inventario.
+    * Contiene información sobre el número de factura, el dinero recibido, el vuelto y el
+    */
 public class Factura {
     
-    private int numeroFactura;
-    private double dineroRecibido;
-    private double vuelto;
-    private String detalle;
-
+    private int     numeroFactura;
+    private double  dineroRecibido;
+    private double  vuelto;
+    private String  detalle;
+    /**
+    * Constructor de la clase Factura.
+    * @param numeroFactura Número de la factura.
+    * @param dineroRecibido Dinero recibido.
+    * @param vuelto Vuelto a entregar.
+    * @param detalle Detalle de la factura.
+    */
     public Factura(int numeroFactura, double dineroRecibido, double vuelto, String detalle) {
-        this.numeroFactura = numeroFactura;
-        this.dineroRecibido = dineroRecibido;
-        this.vuelto = vuelto;
-        this.detalle = detalle;
+        this.numeroFactura =    numeroFactura;
+        this.dineroRecibido =   dineroRecibido;
+        this.vuelto =           vuelto;
+        this.detalle =          detalle;
     }
 
     // Getters
@@ -20,7 +29,10 @@ public class Factura {
     public double getVuelto() { return vuelto; }
     public String getDetalle() { return detalle; }
 
-    // ESTE ES EL MÉTODO QUE FALTA Y QUE VS CODE TE ESTÁ PIDIENDO
+    /**
+    * Genera el texto del recibo de la factura.
+    * @return Texto del recibo de la factura.
+    */
     public String generarTextoRecibo() {
         StringBuilder recibo = new StringBuilder();
         

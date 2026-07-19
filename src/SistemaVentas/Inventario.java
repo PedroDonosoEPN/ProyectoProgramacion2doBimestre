@@ -3,11 +3,20 @@ package SistemaVentas;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Representa el inventario de productos en el sistema de ventas e inventario.
+ * Contiene informacion sobre los productos disponibles, incluyendo nombre, código, cantidad, precio, descripción,
+ * y métodos para acceder a esta información y guardar los cambios en un archivo de texto.
+ */
 public class Inventario {
     
-    // Usamos barras normales (/) para que la ruta funcione igual en Windows, Mac o Linux
+    /**
+    * Ruta del archivo de texto que almacena los productos del inventario.
+    */
     private static final String RUTA_ARCHIVO = "data/datos_inventario.txt";
+    /**
+    * Separador utilizado para dividir los campos de cada producto en el archivo de texto.
+    */
     private static final String SEPARADOR = ",";
 
     /**
