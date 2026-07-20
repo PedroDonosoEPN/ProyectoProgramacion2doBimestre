@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e" pages="1">
     <diagram id="uml-ventas" name="Clases - SistemaVentas">
-        <mxGraphModel dx="3308" dy="662" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2200" pageHeight="1700" math="0" shadow="0">
+        <mxGraphModel dx="3247" dy="626" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2200" pageHeight="1700" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -32,7 +32,7 @@
                     <mxGeometry x="1060" y="600" width="260" height="130" as="geometry"/>
                 </mxCell>
                 <mxCell id="n1013" value="&lt;b&gt;MenuPanel&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt; &lt;hr size=&#39;1&#39;&gt;+ MenuPanel()&lt;br&gt;# paintComponent(g): void&lt;br&gt;- crearTarjeta(...): JPanel&lt;br&gt;- abrirModuloVentas(): void&lt;br&gt;- abrirModuloInventario(): void" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=11;" parent="1" vertex="1">
-                    <mxGeometry x="1360" y="560" width="300" height="170" as="geometry"/>
+                    <mxGeometry x="1360" y="560" width="200" height="170" as="geometry"/>
                 </mxCell>
                 <mxCell id="n1014" value="&lt;b&gt;MainPanel&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt; &lt;hr size=&#39;1&#39;&gt;+ MainPanel()&lt;br&gt;- customizeComponent(): void" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=11;" parent="1" vertex="1">
                     <mxGeometry x="1795" y="620" width="240" height="90" as="geometry"/>
@@ -49,13 +49,13 @@
                 <mxCell id="n1018" value="&lt;b&gt;VistaInventario&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt;- gestionInventario: Inventario&lt;br&gt;- tabla: JTable&lt;br&gt;+ btnAgregar, btnEditar, btnEliminar, btnVolver: JButton&lt;hr size=&#39;1&#39;&gt;+ VistaInventario()&lt;br&gt;- configurarAcciones(): void&lt;br&gt;- crearMenuLateral(): JPanel&lt;br&gt;- crearAreaTrabajo(): JPanel&lt;br&gt;- cargarDatos(modelo): void&lt;br&gt;- guardarTablaEnInventario(modelo): void" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=11;" parent="1" vertex="1">
                     <mxGeometry x="1060" y="1000" width="300" height="210" as="geometry"/>
                 </mxCell>
-                <mxCell id="n1019" value="«clase interna estatica de VistaInventario, extends JDialog»&lt;br&gt;&lt;b&gt;DialogoProducto&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt;- campos de formulario de producto&lt;hr size=&#39;1&#39;&gt;+ getDatosValidados(): String[]" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=11;" parent="1" vertex="1">
+                <mxCell id="n1019" value="&lt;b&gt;DialogoProducto&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;- campos de formulario de producto&lt;hr size=&quot;1&quot;&gt;+ getDatosValidados(): String[]" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=11;" parent="1" vertex="1">
                     <mxGeometry x="1060" y="1230" width="300" height="110" as="geometry"/>
                 </mxCell>
                 <mxCell id="n1020" value="&lt;b&gt;VistaVentas&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt;- gestionInventario: Inventario&lt;br&gt;- ventaActual: Venta&lt;br&gt;- tablaCarrito: JTable&lt;br&gt;- txtEscaner: JTextField&lt;br&gt;- lblSubtotal: JLabel&lt;br&gt;+ btnAgregar, btnTerminar, btnVolver: JButton&lt;hr size=&#39;1&#39;&gt;+ VistaVentas()&lt;br&gt;- configurarAcciones(): void&lt;br&gt;- crearMenuLateral(): JPanel&lt;br&gt;- crearAreaTrabajo(): JPanel&lt;br&gt;- registrarVentaEnArchivo(): void" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=11;" parent="1" vertex="1">
                     <mxGeometry x="1420" y="1000" width="320" height="230" as="geometry"/>
                 </mxCell>
-                <mxCell id="n1021" value="«clase interna de VistaVentas, extends JDialog»&lt;br&gt;&lt;b&gt;DialogoAgregarVenta&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt;- campos para escanear/seleccionar producto&lt;hr size=&#39;1&#39;&gt;+ getProductoSeleccionado(): Producto" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=11;" parent="1" vertex="1">
+                <mxCell id="n1021" value="&lt;b&gt;DialogoAgregarVenta&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;- campos para escanear/seleccionar producto&lt;hr size=&quot;1&quot;&gt;+ getProductoSeleccionado(): Producto" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=11;" parent="1" vertex="1">
                     <mxGeometry x="1420" y="1260" width="320" height="110" as="geometry"/>
                 </mxCell>
                 <mxCell id="n1024" value="&lt;b&gt;PatLabel&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt; &lt;hr size=&#39;1&#39;&gt;+ PatLabel()&lt;br&gt;+ PatLabel(text)&lt;br&gt;- customizeComponent(): void&lt;br&gt;+ setCustomizeComponent(text,font,color,align): void" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fillColor=#FFE6CC;strokeColor=#D79B00;fontSize=11;" parent="1" vertex="1">
@@ -64,17 +64,14 @@
                 <mxCell id="n1025" value="&lt;b&gt;PatTextBox&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt; &lt;hr size=&#39;1&#39;&gt;+ PatTextBox()&lt;br&gt;- customizeComponent(): void&lt;br&gt;+ setBorderRect(): void&lt;br&gt;+ setBorderLine(): void" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fillColor=#FFE6CC;strokeColor=#D79B00;fontSize=11;" parent="1" vertex="1">
                     <mxGeometry x="360" y="1025" width="240" height="150" as="geometry"/>
                 </mxCell>
-                <mxCell id="n1026" value="«implements MouseListener»&lt;br&gt;&lt;b&gt;PatButton&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt; &lt;hr size=&#39;1&#39;&gt;+ PatButton(text)&lt;br&gt;+ PatButton(text, iconPath)&lt;br&gt;+ customizeComponent(text, iconPath): void&lt;br&gt;+ customizeComponent(text): void&lt;br&gt;+ mouseClicked/Pressed/Released/Entered/Exited(e): void" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fillColor=#FFE6CC;strokeColor=#D79B00;fontSize=11;" parent="1" vertex="1">
+                <mxCell id="n1026" value="&lt;b&gt;PatButton&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&amp;nbsp;&lt;hr size=&quot;1&quot;&gt;+ PatButton(text)&lt;br&gt;+ PatButton(text, iconPath)&lt;br&gt;+ customizeComponent(text, iconPath): void&lt;br&gt;+ customizeComponent(text): void&lt;br&gt;+ mouseClicked/Pressed/Released/Entered/Exited(e): void" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fillColor=#FFE6CC;strokeColor=#D79B00;fontSize=11;" parent="1" vertex="1">
                     <mxGeometry x="640" y="1060" width="280" height="180" as="geometry"/>
                 </mxCell>
-                <mxCell id="n1027" value="«implements MouseListener»&lt;br&gt;&lt;b&gt;PatLabelLink&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt; &lt;hr size=&#39;1&#39;&gt;+ PatLabelLink(text)&lt;br&gt;+ PatLabelLink(text, iconPath)&lt;br&gt;- setPersonalizacion(): void&lt;br&gt;+ mouseClicked/Pressed/Released/Entered/Exited(e): void" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fillColor=#FFE6CC;strokeColor=#D79B00;fontSize=11;" parent="1" vertex="1">
+                <mxCell id="n1027" value="&lt;b&gt;PatLabelLink&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&amp;nbsp;&lt;hr size=&quot;1&quot;&gt;+ PatLabelLink(text)&lt;br&gt;+ PatLabelLink(text, iconPath)&lt;br&gt;- setPersonalizacion(): void&lt;br&gt;+ mouseClicked/Pressed/Released/Entered/Exited(e): void" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fillColor=#FFE6CC;strokeColor=#D79B00;fontSize=11;" parent="1" vertex="1">
                     <mxGeometry x="30" y="1300" width="260" height="170" as="geometry"/>
                 </mxCell>
                 <mxCell id="n1028" value="&lt;b&gt;PatLabelText&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt;- lblEtiqueta: PatLabel&lt;br&gt;- txtContenido: PatTextBox&lt;hr size=&#39;1&#39;&gt;+ PatLabelText(etiqueta: String)" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fillColor=#FFE6CC;strokeColor=#D79B00;fontSize=11;" parent="1" vertex="1">
                     <mxGeometry x="360" y="1240" width="260" height="120" as="geometry"/>
-                </mxCell>
-                <mxCell id="n1029" value="«clase de ejemplo, no usada en produccion»&lt;br&gt;&lt;b&gt;LayoutEjemplos&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt; &lt;hr size=&#39;1&#39;&gt;+ addComponentsToPane(): void&lt;br&gt;+ controls(): void&lt;br&gt;..." style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fillColor=#FFE6CC;strokeColor=#D79B00;fontSize=11;" parent="1" vertex="1">
-                    <mxGeometry x="350" y="1380" width="280" height="120" as="geometry"/>
                 </mxCell>
                 <mxCell id="n1030" value="crea / usa" style="endArrow=open;endFill=1;dashed=1;html=1;rounded=0;fontSize=10;" parent="1" source="n1003" target="n1002" edge="1">
                     <mxGeometry relative="1" as="geometry">
@@ -133,9 +130,7 @@
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="n1039" value="" style="startArrow=diamondThin;startFill=1;endArrow=none;html=1;rounded=0;fontSize=10;" parent="1" source="n1020" target="n1021" edge="1">
-                    <mxGeometry x="0.3333" y="50" relative="1" as="geometry">
-                        <mxPoint as="offset"/>
-                    </mxGeometry>
+                    <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="n1041" value="1        1" style="startArrow=diamondThin;startFill=0;endArrow=none;html=1;rounded=0;fontSize=10;exitX=0;exitY=0.3;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;" parent="1" source="n1018" target="n1003" edge="1">
                     <mxGeometry relative="1" as="geometry">
@@ -221,14 +216,6 @@
                         <Array as="points">
                             <mxPoint x="990" y="927"/>
                             <mxPoint x="990" y="1300"/>
-                        </Array>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="n1052" value="usa" style="endArrow=open;endFill=1;dashed=1;html=1;rounded=0;fontSize=10;entryX=0.001;entryY=0.147;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="n1026" target="n1010" edge="1">
-                    <mxGeometry relative="1" as="geometry">
-                        <Array as="points">
-                            <mxPoint x="1020" y="1150"/>
-                            <mxPoint x="1020" y="270"/>
                         </Array>
                     </mxGeometry>
                 </mxCell>
