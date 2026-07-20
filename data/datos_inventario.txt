@@ -1,6 +1,40 @@
-Ibuprofeno,MED-002,2,2.5,Antiinflamatorio 400mg
-Alcohol,INS-001,67,1.0,Botella 250ml 70 grados
-Vendas,INS-002,199,0.5,Venda elástica 5cm
-Jugos,13,4,5.0,
-Pan,34,44,2.0,po
-Arroz,1234,40,56.0,
+Paracetamol,MED-001,50,0.50,Tabletas 500mg
+Ibuprofeno,MED-002,30,2.50,Antiinflamatorio 400mg
+Amoxicilina,MED-003,20,3.50,Antibiotico 500mg
+Aspirina,MED-004,100,0.20,Pastillas 100mg
+Jarabe para tos,MED-005,15,4.75,Frasco 120ml
+Alcohol,INS-001,67,1.00,Botella 250ml 70 grados
+Vendas,INS-002,199,0.50,Venda elastica 5cm
+Algodon,INS-003,45,1.25,Paquete 100g
+Curitas,INS-004,200,0.10,Unidad estandar
+Jeringas,INS-005,80,0.30,Jeringa 5ml con aguja
+Arroz,ALI-001,40,1.20,Libra de arroz flor
+Azucar,ALI-002,50,0.90,Libra de azucar blanca
+Sal,ALI-003,30,0.50,Funda de sal yodada 1kg
+Aceite,ALI-004,25,2.50,Botella de aceite vegetal 1L
+Fideos,ALI-005,60,0.80,Paquete de fideos 400g
+Atun,ALI-006,40,1.50,Lata de atun en aceite 160g
+Sardina,ALI-007,20,1.75,Lata de sardina 425g
+Lenteja,ALI-008,35,1.10,Funda de lenteja 500g
+Pan de molde,ALI-009,15,2.00,Funda de pan blanco
+Huevos,ALI-010,120,0.15,Unidad de huevo de campo
+Leche,BEB-001,40,1.00,Litro de leche entera
+Jugo de durazno,BEB-002,24,0.80,Caja 250ml
+Gaseosa Cola,BEB-003,30,1.50,Botella 1.35L
+Agua sin gas,BEB-004,50,0.50,Botella 500ml
+Bebida hidratante,BEB-005,48,1.25,Botella 500ml mora
+Jabon de bano,ASE-001,60,0.75,Barra de jabon 120g
+Shampoo,ASE-002,20,4.50,Frasco 400ml
+Pasta dental,ASE-003,35,2.00,Tubo 100ml
+Papel higienico,ASE-004,100,0.40,Rollo individual
+Detergente,ASE-005,25,1.80,Funda 1kg
+Desinfectante,ASE-006,20,2.50,Botella 1L aroma lavanda
+Lava vajillas,ASE-007,30,1.20,Tarrina 250g
+Cloro,ASE-008,40,1.00,Botella 1L
+Esponja,ASE-009,50,0.50,Esponja doble cara
+Papas fritas,SNA-001,45,0.60,Funda pequena
+Galletas de sal,SNA-002,50,0.40,Taco de galletas
+Galletas dulces,SNA-003,40,0.50,Paquete 4 unidades
+Chocolates,SNA-004,60,0.30,Barra pequena
+Caramelos,SNA-005,200,0.05,Unidad surtida
+Chicles,SNA-006,100,0.10,Paquete individual menta
