@@ -1,18 +1,42 @@
-## Getting Started
+# Proyecto de Ventas
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+## Descripción
+Aplicación de sistema de ventas que gestiona productos, inventario y operaciones de venta con autenticación de usuarios.
 
-## Folder Structure
+## Funcionalidades
+- Inicio de sesión de usuario
+- Gestión de inventario
+- Registro de ventas
+- Soporte para escaneo de códigos de barras
+- Generación de facturas
 
-The workspace contains two folders by default, where:
+## Requisitos
+- JDK 25
+- Windows 10 o posterior
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
+## Instalación
+1. Descargar el instalador.
+2. Ejecutar `Setup.exe`.
 
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
+## Ejecución
+Hacer doble clic en la aplicación o ejecutar:
 
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
+```sh
+java -jar Main.jar
+```
 
-## Dependency Management
+## Estructura del proyecto
+- `src/`
+  - `GUI/`
+    - `CustomerControl/` — controles reutilizables de interfaz (botones, etiquetas, textos).
+    - `Form/` — paneles y vistas principales de la aplicación (login, menú, inventario, ventas, splash).
+    - `Resource/` — recursos de interfaz y estilos.
+      - `Img/` — imágenes usadas en la interfaz.
+  - `SistemaVentas/` — lógica de dominio de ventas, inventario, facturación y lector de barras.
 
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+## Paquetes Java
+- `GUI` — estilos y configuración general de la interfaz.
+- `GUI.CustomerControl` — componentes personalizados para la GUI.
+- `GUI.Form` — formularios y paneles de la aplicación.
+- `GUI.Resource` — recursos visuales y soporte de imágenes.
+- `SistemaVentas` — clases centrales del sistema de ventas y manejo de datos.
