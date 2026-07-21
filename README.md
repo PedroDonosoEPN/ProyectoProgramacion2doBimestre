@@ -35,7 +35,7 @@ java -jar Main.jar
   - `SistemaVentas/` — lógica de dominio de ventas, inventario, facturación y lector de barras.
 
 ## Normas de código
-- Los paquetes deben escribirse en minúsculas y usar camelCase cuando sea necesario, por ejemplo: `sistemaVentas`, `gui.formularios`.
+- Los paquetes deben escribirse en minúsculas y usar camelCase cuando sea necesario, por ejemplo: `sistemaVentas`
 - Las clases deben usar PascalCase, iniciando con mayúscula, por ejemplo: `LoginPanel`, `Venta`.
 - Las variables, métodos y atributos deben nombrarse en español, usando camelCase y nombres descriptivos, por ejemplo: `nombreCliente`, `totalVenta`, `precioUnitario`.
 - Las constantes deben escribirse en mayúsculas y separar palabras con guion bajo, por ejemplo: `PRECIO_MAXIMO`.
